@@ -12,7 +12,89 @@ import matplotlib.pyplot as plt
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
-def save_plot(array):
+def mins(array,wl):
+    """
+    This function receive as input the spectrum and the wavelenghts.
+    The return value is the list of the minima.
+    
+    The purpose of this function is to find the minima of the
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Variables in input:
+    ----------
+    :param 0: array of the spectrum
+    :param 1: list of wavelenghts
+    
+    
+    :Return values:
+    ----------
+    :value 0: List of minimas of the spectrum
+    """
+    der = np.diff(array)
+    
+    prev = 0
+    min_vals = []
+    for x in range(len(wl)):
+        if der[x-1] > 0 and prev < 0:
+            min_vals.append(x-1)
+        elif der[x-1] == 0 and prev < 0:
+            min_vals.append(x-1)
+        prev = der[x-1]
+    return min_vals
+
+def remove_background(spectrum, wl=[], idx=[], deg=1):
+    """
+    This function receive as input the spectrum, the wavelenghts, the minima points and the deg to compute the regression line.
+    The return value is the label and the normalized spectrum
+    
+    The purpose of this function is to normalize the spectrum
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Variables in input:
+    ----------
+    :param 0: array of the spectrum
+    :param 1: list of wavelenghts
+    :param 2: list of minimas
+    :param 3: deg of regression line
+    
+    :Return values:
+    ----------
+    :value 0: Normalized spectrum (nparray)
+    :value 0: Label of the spectrum
+    """
+    #This has been disabled because is not the right approach, the regression line is jost a background line,
+    #with m = 0
+    '''
+    # Compute a regression line for the first sample
+    p2 = np.polyfit(wl, spectrum, deg = 1)
+    
+    # Calculate the background values
+    back_val = []
+    for x in wl:
+        back_val_current = 0
+        for i in range(len(p2)):
+            back_val_current += p2[len(p2) - i - 1]*(x**i)
+        back_val.append(back_val_current)
+
+    spec_final = spectrum - back_val
+    min_val = np.amin(spec_final)
+    for i in range(len(spec_final)):
+        spec_final[i] -= min_val
+
+    pf = np.poly1d(p2)
+    return [spec_final, pf]
+    '''
+    min_height = min(spectrum)
+    
+    normalized =  np.array(spectrum)
+    normalized -= min_height
+    return (normalized,0)
+
+def save_plot(array, wl=[]):
     """
     This function receive as input an array.
     The return is nothing.
@@ -30,6 +112,8 @@ def save_plot(array):
     ----------
     - no return values
     """
+    if wl == []:
+        wl = range(len(array))
     plt.clf();plt.plot(array,c='black')
     savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
 
@@ -57,13 +141,14 @@ def get_image(param):
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
+    #im.show()
     img_spectrum = im.load()
     return img_spectrum
 
 def get_baseline(img_spectrum, param):
     """
     This function receive as input the matrix of the pixels of the spectrum image, after being cropped, and some parameters as a tuple.
-    The return value is the spectra.
+    The return value is the spectrum.
     
     The purpose of this function is to calculate the y values of the spectrum from the image
     
@@ -86,7 +171,7 @@ def get_baseline(img_spectrum, param):
     
     :Return values:
     ----------
-    :value 0: List of y elements of the spectra
+    :value 0: List of y elements of the spectrum
     """
     
     rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]); 
@@ -143,7 +228,7 @@ def process_image():
     :Return values:
     ----------
     :value 0: Label of the fruit
-    :value 1: List of y elements of the spectra
+    :value 1: List of y elements of the spectrum
     
     """
     
@@ -160,19 +245,19 @@ def process_image():
         print("Unable to calculate baseline")
         return 0
         
+    almost_good = sps.detrend(black_line)
+    almost_good = sps.savgol_filter(black_line, 51, 3)
+    
+    wl = np.array(range(len(almost_good)))
+    idx = mins(almost_good,wl)
+    
+    background_rem,fn = remove_background(almost_good, wl, idx, deg = 3)
+    
     try:
-        almost_good = sps.savgol_filter(black_line, 41, 2)
-        
-        min_height = min(almost_good)
-        
-        normalized =  np.array(almost_good)
-        normalized -= min_height
-        
-        try:
-            save_plot(normalized)
-        except:
-            print("Unable to process plot")
-        return (0,normalized)
+        save_plot(background_rem, wl)
     except:
-        print("Unable to save image")
-        return 0
+        print("Unable to process plot")
+    return (0,background_rem)
+    #except:
+       #print("Unable to save image")
+        #return 0
