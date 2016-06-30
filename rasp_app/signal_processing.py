@@ -1,11 +1,27 @@
+import os
+from flask import Flask, request, redirect, url_for, flash, render_template
+from werkzeug.utils import secure_filename
+import time
+import sqlite3 as lite
+from signal_processing import *
+import scipy.signal as sps
+from matplotlib.pylab import savefig
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+
+HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
+
 def get_image(param):
-    im=Image.open('/home/pi/signal_processing/flask/little_server/' + 'source.jpg')
+
+    im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
     img_spectrum = im.load()
     return img_spectrum
 
 def get_baseline(img_spectrum, param):
+
     rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]); 
     for col in range(0,param[2]-param[0],1):
         count=[0.,0.,0.]
@@ -39,6 +55,7 @@ def get_baseline(img_spectrum, param):
             bl[col+1] = bl[col]
         '''
     black_line = [(rl[i]+gl[i]+bl[i])/3. for i in range(len(rl))]
+    return black_line
 
 def process_image():
     param = (800,1000,2400,1250,5) #left,top,right,bottom, rotate
@@ -63,8 +80,8 @@ def process_image():
         normalized -= min_height
         
         plt.plot(normalized,c='purple'); #plt.show()
-        savefig('/home/pi/signal_processing/flask/little_server/' + 'static/spectrum.png', bbox_inches='tight')
-        return 0
+        savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
+        return (0,normalized)
     except:
         print("Unable to save image")
         return 0

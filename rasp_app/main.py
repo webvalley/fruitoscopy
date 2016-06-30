@@ -4,32 +4,36 @@ from werkzeug.utils import secure_filename
 import time
 import sqlite3 as lite
 from signal_processing import *
+import scipy.signal as sps
+from matplotlib.pylab import savefig
+from PIL import Image
 
 UPLOAD_FOLDER = ''
-APPLICATION_ROOT = '/home/pi/signal_processing/flask/little_server/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
+HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
-app = Flask(__name__)
+app = Flask(__name__, instance_path='/path/to/instance/folder')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['APPLICATION_ROOT'] =  APPLICATION_ROOT
 
 def time_now():
-    in_file = open(home_path + "timestamp.txt","r")
+    in_file = open(HOME_PATH + "/timestamp.txt","r")
     text = in_file.read()
     from_file = int(text)
     time_to_send = int(time.time()) + from_file
     return time_to_send
 
 def update_time(timestamp):
-    out_file = open(home_path + "timestamp.txt","w")
+    out_file = open(HOME_PATH + "/timestamp.txt","w")
     diff_time = int(float(timestamp))-int(time.time())
     out_file.write(str(diff_time))
     out_file.close()
     
 def insert_in_database(picker,field,timestamp,spectrum,gps):
-    con = sqlite.connect(home_path + "static/samples.db")
+    con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
-    cur.execute("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,int(time.time()),db_string,gps))
+    to_execute = ("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,timestamp,spectrum,gps))
+    print(to_execute)
+    cur.execute(to_execute)
     con.commit()
     con.close()
     
@@ -59,7 +63,7 @@ def upload_file():
         try:
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(home_path + "/databases", filename))
+                file.save(os.path.join(HOME_PATH + "/databases", filename))
                 return 'Everything worked, but your file will be deleted because the system is not ready yet'
         except:
             return "unable to work with full file"
@@ -67,14 +71,22 @@ def upload_file():
 
 @app.route('/data_taken', methods=['GET', 'POST'])
 def data_taken():
-    field = request.form['field']
+    field = int(request.form['field'])
     #result = "NOT RIPE YET"
     #time.sleep(0)
+    picker = 1
+    gps = "n/d"
+    timestamp = time_now()
+    
     try:
         processed = process_image()
+        try:
+            insert_in_database(picker, field, timestamp, processed[1],gps)
+        except:
+            print("Unable to insert into database")
     except:
         print("Unable to process image")
-    if processed:
+    if processed[0]:
         result = "IS RIPE"
     else:
         result = "NOT RIPE YET"
@@ -118,5 +130,4 @@ def internal_server_error(error):
     return render_template('500.html'), 500
 
 if __name__ == "__main__":
-    home_path = "/home/pi/signal_processing/flask/little_server/"
     app.run(host='0.0.0.0')
