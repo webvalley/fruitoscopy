@@ -30,7 +30,7 @@ def save_plot(array):
     ----------
     - no return values
     """
-    plt.plot(array,c='black');
+    plt.clf();plt.plot(array,c='black')
     savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
 
 def get_image(param):

@@ -17,6 +17,23 @@ app = Flask(__name__, instance_path='/path/to/instance/folder')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def time_now():
+    """
+    This function receive as input nothing.
+    The return is the current timestamp.
+    
+    The purpose of this function is to get the timestamp from the raspberry without asking to any device.
+    To do so a sync is needed.
+    
+    The timestamp is calculated knowing the difference between the raspberry timestamp and the phone timestamp.
+    Fianal timestamp = raspberry_timestamp + difference_in_timestamp 
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Return values:
+    ----------
+    - The current timestamp 
+    """
     in_file = open(HOME_PATH + "/timestamp.txt","r")
     text = in_file.read()
     from_file = int(text)
@@ -24,12 +41,51 @@ def time_now():
     return time_to_send
 
 def update_time(timestamp):
+    """
+    This function receive as input the current timestamp of the device connected to the raspberry.
+    No return is given
+    
+    The purpose of this function is to update the file with the difference of the tymestamp between the device and the raspberry
+    to get a precise metadata
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Values in input:
+    ----------
+    :value 0: The timestamp of the phone/PC
+    
+    :Return values:
+    ----------
+    - nothing
+    """
     out_file = open(HOME_PATH + "/timestamp.txt","w")
     diff_time = int(float(timestamp))-int(time.time())
     out_file.write(str(diff_time))
     out_file.close()
     
 def insert_in_database(picker,field,timestamp,spectrum,gps):
+    """
+    This function receive as input the information about what to insert as a new row into the database
+    This function has no return.
+    
+    The purpose of this function is to insert new data from the samples into the database.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Values in input:
+    ----------
+    :value 0: The number of the picker
+    :value 1: The number of the field
+    :value 2: The current timestamp
+    :value 3: The list (or the tuple) where the spectrum is saved (as a list/tuple of float)
+    :value 4: gps informations (not implemented yet)
+    
+    :Return values:
+    ----------
+    - The HTML page with all the informations about the sample (and te spectrum)
+    """
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,timestamp,",".join(map(str, spectrum)),gps))
@@ -38,7 +94,24 @@ def insert_in_database(picker,field,timestamp,spectrum,gps):
     con.close()
     
 def get_from_database():
+    """
+    This function has no input.
+    The return is the tuple with all the information on the database.
     
+    The purpose of this function is to list all the samples available on the database.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Return values:
+    ----------
+    - The tuple with all the information
+    
+    Tuple -> (row1,row2, ... ,rown)
+    
+    Where rown -> (field1, field2, ... , fieldn)
+    
+    """
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     
@@ -50,6 +123,24 @@ def get_from_database():
     return result
 
 def get_data_by_id(id_db):
+    """
+    This function receive as input the id of the database.
+    The return is the page with the informations about the data of the sample that has been requested.
+    
+    The purpose of this function is to show more informations about a specific sample that has been taken by the device and that
+    is still in the database.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Values in input:
+    ----------
+    :value 0: The id of the sample to show
+    
+    :Return values:
+    ----------
+    - The HTML page with all the informations about the sample (and te spectrum)
+    """
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("SELECT * FROM Samples WHERE id=" + str(id_db))
@@ -58,13 +149,13 @@ def get_data_by_id(id_db):
     result = cur.fetchone()
     con.close()
     spectrum = result[4].split(",")
-    print(spectrum)
+    print(spectrum[1])
     return spectrum
 
 def delete_data_by_id(id_db):
     """
-    This function receive as input the id of the database.
-    The return is the page that confirm the row of the id has been deleted from the database.
+    This function receive as input the id of the row of the database.
+    The is no return value
     
     The purpose of this function is to delete from the SQLite database a row of the database.
     
@@ -77,7 +168,7 @@ def delete_data_by_id(id_db):
     
     :Return values:
     ----------
-    - The confirmation HTML page
+    - nothing
     """
     
     con= lite.connect(HOME_PATH + "/static/samples.db")
@@ -122,21 +213,12 @@ def upload_file():
 @app.route('/data_taken', methods=['GET', 'POST'])
 def data_taken():
     field = int(request.form['field'])
-    #result = "NOT RIPE YET"
-    #time.sleep(0)
     picker = 1
     gps = "n/d"
     timestamp = time_now()
-    
-    #try:
     processed = process_image()
     spectrum = processed[1].tolist()
-    #    try:
     insert_in_database(picker, field, timestamp, spectrum,gps)
-    #    except:
-    #        print("Unable to insert into database")
-    #except:
-    #    print("Unable to process image")
     if processed[0]:
         result = "IS RIPE"
     else:
@@ -145,16 +227,46 @@ def data_taken():
 
 @app.route('/take_data/<int:field>')
 def take_data(field):
+    """
+    This function receive as input (POST request) the number of the field where the picker is working.
+    The return is the page that confirm the row of the id has been deleted from the database.
+    
+    The purpose of this function is to delete from the SQLite database a row of the database.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Values in input:
+    ----------
+    :value 0: The id of the row to delete
+    
+    :Return values:
+    ----------
+    - The confirmation HTML page
+    """
     return render_template('take_data.html', field=field)
+
 
 @app.route('/sync_timestamp', methods=['GET', 'POST'])
 def sync_timestamp():
+    """
+    This function receive as input (POST request) the current phone timestamp.
+    The return is the confirmation that the sync happened.
+    
+    The purpose of this function is to sync the raspberry, because has no battery inside.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Return values:
+    ----------
+    - OK if the sync is made, nothing if something bad happens
+    """
     try:
         timestamp = request.form['timestamp']
     except:
         print("Unable to retrieve timestamp from post request")
     try:
-        #lolol(1)
         update_time(timestamp)
     except:
         print("Unable to update_time")
@@ -162,27 +274,55 @@ def sync_timestamp():
 
 @app.route('/')
 def show_html():
-    print(HOME_PATH)
+    """
+    Open the index page
+    """
     return render_template('index.html')
 
 @app.route('/get_db')
 def download_db():
+    """
+    show the page to download the database from the raspberry into the device
+    """
     return render_template('get_db.html')
 
 @app.route('/send_db')
 def upload_db():
+    """
+    Show the page to send the database to the server (the django one that will be deployed)
+    """
     return render_template('send_db.html')
 
 @app.errorhandler(404)
 def page_not_found(error):
+    """
+    If a non-handled error happens, show the 404 error page
+    """
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_server_error(error):
+    """
+    If a non-handled error happens, show the 500 error page
+    """
     return render_template('500.html'), 500
 
 @app.route('/database_info')
 def show_database_info():
+    """
+    This function receive as input nothing.
+    The return is the page that shows all the records of the samples in the database of the raspberry.
+    
+    The purpose of this function is to show a summary of the informations into the database and give the user
+    the possibility to access more informations.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Return values:
+    ----------
+    - The database HTML page
+    """
     try:
         rows_a = get_from_database()
     except:
@@ -198,6 +338,24 @@ def show_database_info():
 
 @app.route('/more_info/<int:id_db>')
 def show_more_info(id_db):
+    """
+    This function receive as input the id of the database.
+    The return is the page with the informations about the data of the sample that has been requested.
+    
+    The purpose of this function is to show more informations about a specific sample that has been taken by the device and that
+    is still in the database.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Values in input:
+    ----------
+    :value 0: The id of the sample to show
+    
+    :Return values:
+    ----------
+    - The HTML page with all the informations about the sample (and te spectrum)
+    """
     try:
         spectrum = get_data_by_id(id_db)
     except:
@@ -214,7 +372,10 @@ def show_more_info(id_db):
 
 @app.route('/delete_data/<int:id_db>')
 def delete_data(id_db):
-    
+    """
+    This function is just the route to the delete_data function.
+    The documentation about the deletion of the data can be found there.
+    """
     
     delete_data_by_id(id_db)
     
