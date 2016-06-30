@@ -91,3 +91,10 @@ savedata[3:] = bl
 savedata[4:] = fullsp
 
 np.savetxt(dname, savedata, fmt = '%10.5f', delimiter = ',')
+
+# Automatically run the pre-processing
+try:
+    cmd = 'python pre-process.py --name ' + dname
+    subprocess.call(cmd, shell = True)
+except KeyboardInterrupt:
+    print ('good bye')
