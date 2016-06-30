@@ -9,6 +9,7 @@ from matplotlib.pylab import savefig
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+from database_interactions import *
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,24 +17,24 @@ def mins(array,wl):
     """
     This function receive as input the spectrum and the wavelenghts.
     The return value is the list of the minima.
-    
+
     The purpose of this function is to find the minima of the
-    
+
     Specifically:
     @@@@@@@@@@@@@
-    
+
     :Variables in input:
     ----------
     :param 0: array of the spectrum
     :param 1: list of wavelenghts
-    
-    
+
+
     :Return values:
     ----------
     :value 0: List of minimas of the spectrum
     """
     der = np.diff(array)
-    
+
     prev = 0
     min_vals = []
     for x in range(len(wl)):
@@ -48,19 +49,19 @@ def remove_background(spectrum, wl=[], idx=[], deg=1):
     """
     This function receive as input the spectrum, the wavelenghts, the minima points and the deg to compute the regression line.
     The return value is the label and the normalized spectrum
-    
+
     The purpose of this function is to normalize the spectrum
-    
+
     Specifically:
     @@@@@@@@@@@@@
-    
+
     :Variables in input:
     ----------
     :param 0: array of the spectrum
     :param 1: list of wavelenghts
     :param 2: list of minimas
     :param 3: deg of regression line
-    
+
     :Return values:
     ----------
     :value 0: Normalized spectrum (nparray)
@@ -71,7 +72,7 @@ def remove_background(spectrum, wl=[], idx=[], deg=1):
     '''
     # Compute a regression line for the first sample
     p2 = np.polyfit(wl, spectrum, deg = 1)
-    
+
     # Calculate the background values
     back_val = []
     for x in wl:
@@ -89,7 +90,7 @@ def remove_background(spectrum, wl=[], idx=[], deg=1):
     return [spec_final, pf]
     '''
     min_height = min(spectrum)
-    
+
     normalized =  np.array(spectrum)
     normalized -= min_height
     return (normalized,0)
@@ -98,16 +99,16 @@ def save_plot(array, wl=[]):
     """
     This function receive as input an array.
     The return is nothing.
-    
+
     The purpose of this function is to create a plot of the values of the array and save it.
-    
+
     Specifically:
     @@@@@@@@@@@@@
-    
+
     :Values in input:
     ----------
     :value 0: array of the y elements of a spectrum
-    
+
     :Return values:
     ----------
     - no return values
@@ -117,14 +118,14 @@ def save_plot(array, wl=[]):
     plt.clf();plt.plot(array,c='black')
     savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
 
-def get_image(param):
+def get_image():
     """
     This function receive as input some parameters as a tuple.
     The return value is the image of the spectrum.
-    
+
     Specifically:
     @@@@@@@@@@@@@
-    
+
     :Parameters of the tuple:
     ----------
     :param 0: Left margin of image to crop
@@ -132,12 +133,12 @@ def get_image(param):
     :param 2: Left margin of image to crop
     :param 3: Bottom margin of image to crop
     :param 4: Degrees to rotate the image (+ is CCW)
-    
+
     :Return values:
     ----------
     :value 0: Image of the spectrum
     """
-    
+    param = get_params()
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
@@ -145,16 +146,16 @@ def get_image(param):
     img_spectrum = im.load()
     return img_spectrum
 
-def get_baseline(img_spectrum, param):
+def get_baseline(img_spectrum):
     """
     This function receive as input the matrix of the pixels of the spectrum image, after being cropped, and some parameters as a tuple.
     The return value is the spectrum.
-    
+
     The purpose of this function is to calculate the y values of the spectrum from the image
-    
+
     Specifically:
     @@@@@@@@@@@@@
-    
+
     :Parameters of the tuple:
     ----------
     :param 0: Left margin of image to crop
@@ -162,19 +163,19 @@ def get_baseline(img_spectrum, param):
     :param 2: Left margin of image to crop
     :param 3: Bottom margin of image to crop
     :param 4: Degrees to rotate the image (+ is CCW)
-    
+
     :Matrix:
     ----------
     r,g,b = matrix[col, row]
     where "col" is column of the matrix and "row" is the row
     r, g and b are the 3 components, red, green and blue of every pixel of the matrix
-    
+
     :Return values:
     ----------
     :value 0: List of y elements of the spectrum
     """
-    
-    rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]); 
+    param=get_params()
+    rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]);
     for col in range(0,param[2]-param[0],1):
         count=[0.,0.,0.]
         for row in range(0,param[3]-param[1],1):
@@ -200,7 +201,7 @@ def get_baseline(img_spectrum, param):
             rl[col-1] = rl[col]
             gl[col-1] = gl[col]
             bl[col-1] = bl[col]
-        
+
         if(col == param[2]-param[0]-2):
             rl[col+1] = rl[col]
             gl[col+1] = gl[col]
@@ -213,10 +214,10 @@ def process_image():
     """
     I will process the image, taking 1 tuple made of parameters as input.
     The return values will be the label of the sample and the spectrum
-    
+
     Specifically:
     @@@@@@@@@@@@@
-    
+
     :Parameters:
     ----------
     :param 0: Left margin of image to crop
@@ -224,35 +225,36 @@ def process_image():
     :param 2: Left margin of image to crop
     :param 3: Bottom margin of image to crop
     :param 4: Degrees to rotate the image (+ is CCW)
-    
+
     :Return values:
     ----------
     :value 0: Label of the fruit
     :value 1: List of y elements of the spectrum
-    
+
     """
-    
-    param = (800,1000,2400,1250,5) #left,top,right,bottom, rotate
+
+    #param = (800,1000,2400,1250,5) #left,top,right,bottom, rotate
+    param = get_params()
     try:
-        img_spectrum = get_image(param)
+        img_spectrum = get_image()
     except:
         print("Unable to get image from source")
         return 0
 
     try:
-        black_line = get_baseline(img_spectrum,param)
+        black_line = get_baseline(img_spectrum)
     except:
         print("Unable to calculate baseline")
         return 0
-        
+
     almost_good = sps.detrend(black_line)
     almost_good = sps.savgol_filter(black_line, 51, 3)
-    
+
     wl = np.array(range(len(almost_good)))
     idx = mins(almost_good,wl)
-    
+
     background_rem,fn = remove_background(almost_good, wl, idx, deg = 3)
-    
+
     try:
         save_plot(background_rem, wl)
     except:
