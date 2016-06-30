@@ -7,6 +7,7 @@ from signal_processing import *
 import scipy.signal as sps
 from matplotlib.pylab import savefig
 from PIL import Image
+import datetime
 
 UPLOAD_FOLDER = ''
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
@@ -31,8 +32,57 @@ def update_time(timestamp):
 def insert_in_database(picker,field,timestamp,spectrum,gps):
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
-    to_execute = ("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,timestamp,spectrum,gps))
-    print(to_execute)
+    to_execute = ("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,timestamp,",".join(map(str, spectrum)),gps))
+    cur.execute(to_execute)
+    con.commit()
+    con.close()
+    
+def get_from_database():
+    
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    
+    to_execute = ("SELECT * FROM Samples")
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchall()
+    con.close()
+    return result
+
+def get_data_by_id(id_db):
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("SELECT * FROM Samples WHERE id=" + str(id_db))
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchone()
+    con.close()
+    spectrum = result[4].split(",")
+    print(spectrum)
+    return spectrum
+
+def delete_data_by_id(id_db):
+    """
+    This function receive as input the id of the database.
+    The return is the page that confirm the row of the id has been deleted from the database.
+    
+    The purpose of this function is to delete from the SQLite database a row of the database.
+    
+    Specifically:
+    @@@@@@@@@@@@@
+    
+    :Values in input:
+    ----------
+    :value 0: The id of the row to delete
+    
+    :Return values:
+    ----------
+    - The confirmation HTML page
+    """
+    
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("DELETE FROM Samples WHERE id=" + str(id_db))
     cur.execute(to_execute)
     con.commit()
     con.close()
@@ -78,14 +128,15 @@ def data_taken():
     gps = "n/d"
     timestamp = time_now()
     
-    try:
-        processed = process_image()
-        try:
-            insert_in_database(picker, field, timestamp, processed[1],gps)
-        except:
-            print("Unable to insert into database")
-    except:
-        print("Unable to process image")
+    #try:
+    processed = process_image()
+    spectrum = processed[1].tolist()
+    #    try:
+    insert_in_database(picker, field, timestamp, spectrum,gps)
+    #    except:
+    #        print("Unable to insert into database")
+    #except:
+    #    print("Unable to process image")
     if processed[0]:
         result = "IS RIPE"
     else:
@@ -111,6 +162,7 @@ def sync_timestamp():
 
 @app.route('/')
 def show_html():
+    print(HOME_PATH)
     return render_template('index.html')
 
 @app.route('/get_db')
@@ -129,5 +181,50 @@ def page_not_found(error):
 def internal_server_error(error):
     return render_template('500.html'), 500
 
+@app.route('/database_info')
+def show_database_info():
+    try:
+        rows_a = get_from_database()
+    except:
+        print("Unable to get data from database")
+        return render_template('500.html'), 500
+    rows = list(list(i) for i in rows_a)
+
+    for i in range(len(rows)):
+        rows[i][3] = datetime.datetime.fromtimestamp(rows[i][3]).strftime('%d-%m-%Y %H:%M:%S')
+    
+    return render_template('show_database.html',rows=rows)
+
+
+@app.route('/more_info/<int:id_db>')
+def show_more_info(id_db):
+    try:
+        spectrum = get_data_by_id(id_db)
+    except:
+        print("Unable to get spectrum from database")
+        return render_template('500.html'), 500
+    
+    #try:
+    spectrum = [float(x) for x in spectrum]
+    save_plot(spectrum)
+    #except:
+        #print("Unable to save plot")
+    
+    return render_template('more_info_from_row.html', id_db=id_db)
+
+@app.route('/delete_data/<int:id_db>')
+def delete_data(id_db):
+    
+    
+    delete_data_by_id(id_db)
+    
+    return render_template('row_deleted.html')
+    
+        
+    
+    
 if __name__ == "__main__":
+    """
+    Just start the server open to everyone, on the port 5000
+    """
     app.run(host='0.0.0.0')

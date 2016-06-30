@@ -1,0 +1,21 @@
+{% for row in rows %}
+<ul>
+    <li>
+        <p>ID: {{row[0]}}</p>
+    </li>
+    <li>
+        <p>Picker: {{row[1]}}</p>
+    </li>
+    <li>
+        <p>Field: {{row[2]}}</p>
+    </li>
+    <li>
+        <p>Time: {{row[3]}}</p>
+    </li>
+    <li>
+        <p>GPS: {{row[5]}}</p>
+    </li>
+</ul>
+<a href="../more_info/{{row[0]}}"><button>MORE INFO for ID {{row[0]}}</button></a>
+<br><br><br>
+{% endfor %}
