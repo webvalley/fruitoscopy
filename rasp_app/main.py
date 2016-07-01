@@ -297,8 +297,8 @@ def calib_spectrum():
 
 @app.route('/calib_spectrum_done', methods=['GET', 'POST'])
 def calib_spectrum_done():
-    blue = int(request.form['blue'])
-    red = int(request.form['red'])
+    blue = int(request.form.get('blue'))
+    red = int(request.form.get('red'))
     update_spectrum_params((blue,red))
     return "OK"
     return render_template('calib_spectrum_done.html', param=get_spectrum_param())
