@@ -45,6 +45,9 @@
            width: auto;}
       .dropdown-menu {width: 400px;
                      text-align: center;}
+      body {background-image: url({{url_for('static', filename='sfondo.jpg') }});}
+      body {background-size: cover;
+           background-attachment: fixed;}
     </style>
     <div class="body">
       <nav class="navbar navbar-default">
@@ -125,6 +128,7 @@
 
       <footer class="footer">
         <div class="container">
+          <br>
           <div class="row">
             <div class="col-md-4">
               <b>Web Valley 2016</b>
