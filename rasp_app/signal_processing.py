@@ -116,9 +116,10 @@ def save_plot(array, wl=[]):
     if wl == []:
         wl = range(len(array))
     plt.clf();plt.plot(array,c='black')
-    f=open(HOME_PATH + '/static/spectrum.csv','a')
-    f.write(",".join(map(str, array))+'\n')
-    f.close()
+    #Uncomment to save csv arrays
+    #f=open(HOME_PATH + '/static/spectrum.csv','a')
+    #f.write(",".join(map(str, array))+'\n')
+    #f.close()
     savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
 
 def get_image():
