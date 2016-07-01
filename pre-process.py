@@ -35,9 +35,9 @@ def mins(array):
     
 
 # Remove background from spectra
-def remove_background(spectrum, wl, idx, deg):
+def remove_background(spectrum, wl, idx, deg, index):
     # Compute a regression line for the first sample
-    p2 = np.polyfit(wl[idx], spectrum[0, idx].flatten(), deg = 3)
+    p2 = np.polyfit(wl[idx], spectrum[index, idx].flatten(), deg = deg)
 
     # Calculate the background values
     back_val = []
@@ -48,7 +48,7 @@ def remove_background(spectrum, wl, idx, deg):
             back_val_current += p2[len(p2) - i - 1]*(x**i)
         back_val.append(back_val_current)
 
-    spec_final = spectrum[0, :] - back_val[0:]
+    spec_final = spectrum[index, :] - back_val[0:]
     min_val = np.amin(spec_final)
     for i in range(len(spec_final)):
         spec_final[i] -= min_val
@@ -76,8 +76,9 @@ if __name__ == '__main__':
     n, p = spectrum.shape
    
     # Have a first look at our spectra
+    color = {0: 'r', 1: 'g', 2: 'b', 3: 'k'}
     for i in range(n):
-        plt.plot(wl, spectrum[i, :], '--', label='sample %d' % i)
+        plt.plot(wl, spectrum[i, :], color[i], label='sample %d' % i)
     plt.grid()
     plt.xlabel('Wavelength (nm)')
     plt.ylabel('Reflection intensity')
@@ -88,18 +89,20 @@ if __name__ == '__main__':
     wl = tmpdata[0]
     spectrum = tmpdata[1:]
 
-    # Find local minima
-    idx = mins(spectrum[0])
+    # Loop through all colors (r, g, b, combined)
+    for i in range(4):
+        # Find local minima
+        idx = mins(spectrum[i])
 
-    # Remove background
-    background_rem = remove_background(spectrum, wl, idx, deg = 3)
-    spectra_final = background_rem[0]
-    pf = background_rem[1]
+        # Remove background
+        background_rem = remove_background(spectrum, wl, idx, deg = 3, index = i)
+        spectra_final = background_rem[0]
+        pf = background_rem[1]
 
-    # Plot and have a look at the data
-    plt.plot(wl, spectra_final, 'b', label='sample %d' % 0)
-    plt.plot(wl[idx], spectrum[0, idx], 'or', label='local minima')
-    plt.plot(wl, pf(wl), '--', label='Fitting')
+        # Plot and have a look at the data
+        plt.plot(wl, spectra_final, color[i], label='sample %d' % i)
+        #plt.plot(wl[idx], spectrum[0, idx], 'or', label='local minima')
+        #plt.plot(wl, pf(wl), '--', label='Fitting %d' % i)
         
     plt.grid()
     plt.legend()
