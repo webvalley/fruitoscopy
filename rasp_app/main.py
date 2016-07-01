@@ -3,36 +3,68 @@ from flask import Flask, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
 import time
 import sqlite3 as lite
+import scipy.signal as sps
+from matplotlib.pylab import savefig
+from PIL import Image
+import datetime
 from signal_processing import *
+from database_interactions import *
 
 UPLOAD_FOLDER = ''
-APPLICATION_ROOT = '/home/pi/signal_processing/flask/little_server/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
+HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['APPLICATION_ROOT'] =  APPLICATION_ROOT
 
 def time_now():
-    in_file = open(home_path + "timestamp.txt","r")
+    """
+    This function receive as input nothing.
+    The return is the current timestamp.
+
+    The purpose of this function is to get the timestamp from the raspberry without asking to any device.
+    To do so a sync is needed.
+
+    The timestamp is calculated knowing the difference between the raspberry timestamp and the phone timestamp.
+    Fianal timestamp = raspberry_timestamp + difference_in_timestamp
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Return values:
+    ----------
+    - The current timestamp
+    """
+    in_file = open(HOME_PATH + "/timestamp.txt","r")
     text = in_file.read()
     from_file = int(text)
     time_to_send = int(time.time()) + from_file
     return time_to_send
 
 def update_time(timestamp):
-    out_file = open(home_path + "timestamp.txt","w")
+    """
+    This function receive as input the current timestamp of the device connected to the raspberry.
+    No return is given
+
+    The purpose of this function is to update the file with the difference of the tymestamp between the device and the raspberry
+    to get a precise metadata
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Values in input:
+    ----------
+    :value 0: The timestamp of the phone/PC
+
+    :Return values:
+    ----------
+    - nothing
+    """
+    out_file = open(HOME_PATH + "/timestamp.txt","w")
     diff_time = int(float(timestamp))-int(time.time())
     out_file.write(str(diff_time))
     out_file.close()
-    
-def insert_in_database(picker,field,timestamp,spectrum,gps):
-    con = sqlite.connect(home_path + "static/samples.db")
-    cur = con.cursor()
-    cur.execute("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,int(time.time()),db_string,gps))
-    con.commit()
-    con.close()
-    
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -55,11 +87,11 @@ def upload_file():
                     return "Unable to flash"
         except:
             return "Unable to work with empty file"
-        
+
         try:
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(home_path + "/databases", filename))
+                file.save(os.path.join(HOME_PATH + "/databases", filename))
                 return 'Everything worked, but your file will be deleted because the system is not ready yet'
         except:
             return "unable to work with full file"
@@ -67,14 +99,14 @@ def upload_file():
 
 @app.route('/data_taken', methods=['GET', 'POST'])
 def data_taken():
-    field = request.form['field']
-    #result = "NOT RIPE YET"
-    #time.sleep(0)
-    try:
-        processed = process_image()
-    except:
-        print("Unable to process image")
-    if processed:
+    field = int(request.form['field'])
+    picker = 1
+    gps = "n/d"
+    timestamp = time_now()
+    processed = process_image()
+    spectrum = processed[1].tolist()
+    insert_in_database(picker, field, timestamp, spectrum,gps)
+    if processed[0]:
         result = "IS RIPE"
     else:
         result = "NOT RIPE YET"
@@ -82,16 +114,46 @@ def data_taken():
 
 @app.route('/take_data/<int:field>')
 def take_data(field):
+    """
+    This function receive as input (POST request) the number of the field where the picker is working.
+    The return is the page that confirm the row of the id has been deleted from the database.
+
+    The purpose of this function is to delete from the SQLite database a row of the database.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Values in input:
+    ----------
+    :value 0: The id of the row to delete
+
+    :Return values:
+    ----------
+    - The confirmation HTML page
+    """
     return render_template('take_data.html', field=field)
+
 
 @app.route('/sync_timestamp', methods=['GET', 'POST'])
 def sync_timestamp():
+    """
+    This function receive as input (POST request) the current phone timestamp.
+    The return is the confirmation that the sync happened.
+
+    The purpose of this function is to sync the raspberry, because has no battery inside.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Return values:
+    ----------
+    - OK if the sync is made, nothing if something bad happens
+    """
     try:
         timestamp = request.form['timestamp']
     except:
         print("Unable to retrieve timestamp from post request")
     try:
-        #lolol(1)
         update_time(timestamp)
     except:
         print("Unable to update_time")
@@ -99,24 +161,118 @@ def sync_timestamp():
 
 @app.route('/')
 def show_html():
+    """
+    Open the index page
+    """
     return render_template('index.html')
 
 @app.route('/get_db')
 def download_db():
+    """
+    show the page to download the database from the raspberry into the device
+    """
     return render_template('get_db.html')
 
 @app.route('/send_db')
 def upload_db():
+    """
+    Show the page to send the database to the server (the django one that will be deployed)
+    """
     return render_template('send_db.html')
 
 @app.errorhandler(404)
 def page_not_found(error):
+    """
+    If a non-handled error happens, show the 404 error page
+    """
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_server_error(error):
+    """
+    If a non-handled error happens, show the 500 error page
+    """
     return render_template('500.html'), 500
 
+@app.route('/database_info')
+def show_database_info():
+    """
+    This function receive as input nothing.
+    The return is the page that shows all the records of the samples in the database of the raspberry.
+
+    The purpose of this function is to show a summary of the informations into the database and give the user
+    the possibility to access more informations.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Return values:
+    ----------
+    - The database HTML page
+    """
+    try:
+        rows_a = get_from_database()
+    except:
+        print("Unable to get data from database")
+        return render_template('500.html'), 500
+    rows = list(list(i) for i in rows_a)
+
+    for i in range(len(rows)):
+        rows[i][3] = datetime.datetime.fromtimestamp(rows[i][3]).strftime('%d-%m-%Y %H:%M:%S')
+
+    return render_template('show_database.html',rows=rows)
+
+
+@app.route('/more_info/<int:id_db>')
+def show_more_info(id_db):
+    """
+    This function receive as input the id of the database.
+    The return is the page with the informations about the data of the sample that has been requested.
+
+    The purpose of this function is to show more informations about a specific sample that has been taken by the device and that
+    is still in the database.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Values in input:
+    ----------
+    :value 0: The id of the sample to show
+
+    :Return values:
+    ----------
+    - The HTML page with all the informations about the sample (and te spectrum)
+    """
+    try:
+        spectrum = get_data_by_id(id_db)
+    except:
+        print("Unable to get spectrum from database")
+        return render_template('500.html'), 500
+
+    #try:
+    spectrum = [float(x) for x in spectrum]
+    save_plot(spectrum)
+    #except:
+        #print("Unable to save plot")
+
+    return render_template('more_info_from_row.html', id_db=id_db)
+
+@app.route('/delete_data/<int:id_db>')
+def delete_data(id_db):
+    """
+    This function is just the route to the delete_data function.
+    The documentation about the deletion of the data can be found there.
+    """
+
+    delete_data_by_id(id_db)
+
+    return render_template('row_deleted.html')
+
+
+
+
 if __name__ == "__main__":
-    home_path = "/home/pi/signal_processing/flask/little_server/"
+    """
+    Just start the server open to everyone, on the port 5000
+    """
     app.run(host='0.0.0.0')
