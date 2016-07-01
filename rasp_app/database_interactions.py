@@ -150,3 +150,34 @@ def get_params():
     con.close()
     param = result
     return param
+
+def update_calib_params(params):
+    """
+    This function receive as input the params to update into the database.
+    The return value is a tuple with all the parameters saved into the SQLite DB.
+
+    The purpose of this function is to update the parameters for the image processing.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Params:
+    ----------
+    :param 0: Left margin of image to crop
+    :param 1: Top margin of image to crop
+    :param 2: Left margin of image to crop
+    :param 3: Bottom margin of image to crop
+    :param 4: Degrees to rotate the image (+ is CCW)
+    """
+
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("DELETE FROM Params")
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchone()
+    to_execute = ("INSERT INTO Params VALUES (%d,%d,%d,%d,%d)" % (params[0],params[1],params[2],params[3],params[4]))
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchone()
+    con.close()

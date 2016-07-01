@@ -268,7 +268,29 @@ def delete_data(id_db):
 
     return render_template('row_deleted.html')
 
+@app.route('/calib')
+def calib_index():
+    return render_template('calib_index.html')
 
+@app.route('/calib_crop_rotate', methods=['GET', 'POST'])
+def calib_crop_rotate():
+    get_image()
+    return render_template('calib_crop_rotate.html',param=get_params())
+
+@app.route('/calib_crop_rotate_done', methods=['GET', 'POST'])
+def calib_crop_rotate_done():
+    p_0 = int(request.form['param_0'])
+    p_1 = int(request.form['param_1'])
+    p_2 = int(request.form['param_2'])
+    p_3 = int(request.form['param_3'])
+    p_4 = int(request.form['param_4'])
+    param = (p_0,p_1,p_2,p_3,p_4)
+    update_calib_params(param)
+    return render_template('calib_crop_rotate_done.html')
+
+@app.route('/calib_spectrum')
+def calib_spectrum():
+    return render_template('calib_spectrum.html')
 
 
 if __name__ == "__main__":

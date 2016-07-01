@@ -1,0 +1,18 @@
+<center>
+  <img src="{{url_for('static', filename='processed.jpg')}}" style="width:60%;"/>
+</center>
+<form action="../calib_crop_rotate_done" method=post enctype=multipart/form-data>
+    <span>From left</span><input type=number name=param_0 value= {{param[0]}}>
+    <br>
+    <span>From top</span><input type=number name=param_1 value= {{param[1]}}>
+    <br>
+    <span>From right</span><input type=number name=param_2 value= {{param[2]}}>
+    <br>
+    <span>From bottom</span><input type=number name=param_3 value= {{param[3]}}>
+    <br>
+    <span>Rotation</span><input type=number name=param_4 value= {{param[4]}}>
+    <br>
+    <button type="submit">Upload changes</button>
+</form>
+
+<a href="/"><button>Go back to index</button></a>

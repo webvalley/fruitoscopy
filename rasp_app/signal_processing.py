@@ -142,6 +142,7 @@ def get_image():
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
+    im.save(HOME_PATH + '/static/processed.jpg')
     #im.show()
     img_spectrum = im.load()
     return img_spectrum
