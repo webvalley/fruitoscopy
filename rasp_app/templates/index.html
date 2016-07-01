@@ -43,6 +43,8 @@
       .fix2 {padding-left: 0;
            padding-right: 0;
            width: auto;}
+      .dropdown-menu {width: 400px;
+                     text-align: center;}
     </style>
     <div class="body">
       <nav class="navbar navbar-default">
@@ -69,11 +71,50 @@
             <a href="take_data/1"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Take samples</b></button></a>
           </div>
           <div class="col-md-4">
-            <a href="manage_data/1"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Manage Data</b></button></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Manage Data  </b><span class="caret"></span></button></a>
+            <ul class="dropdown-menu">
+              <a href="database_info">
+                <br>
+                  <li>View Data</li>
+                <br>
+              </a>
+              <li role="separator" class="divider"></li>
+              <a href="get_db">
+                <br>
+                  <li>Get Data</li>
+                <br>
+              </a>
+              <li role="separator" class="divider"></li>
+              <a href="send_db">
+                <br>
+                  <li>Send Data</li>
+                <br>
+              </a>
+            </ul>
           </div>
           <div class="col-md-4">
-            <button id="sync_timestamp" type="button" class="btn btn-primary btn-lg btn-block"><b>Sync timestamp</b></button>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Options  </b><span class="caret"></span></button></a>
+            <ul class="dropdown-menu">
+              <a href="calib_crop_rotate">
+                <br>
+                  <li>Calibrate immage area</li>
+                <br>
+              </a>
+              <li role="separator" class="divider"></li>
+              <a href="calib_spectrum">
+                <br>
+                  <li>Calibrate wavelenght</li>
+                <br>
+              </a>
+              <li role="separator" class="divider"></li>
+              <a id="sync_timestamp" href="#">
+                <br>
+                  <li>Sync timestamp</li>
+                <br>
+              </a>
+            </ul>
           </div>
+
         </div>
         <br>
       </div>
@@ -99,7 +140,20 @@
       </footer>
 
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="{{url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+        $("#sync_timestamp").click(function(){
+            var posting = $.post(
+              '/sync_timestamp',
+                {timestamp: (Date.now()/1000)}
+            );
+            posting.done(function( data ) {
+                if(data=="OK"){
+                    alert("Timestamp is now in sync");
+                }
+            });
+        });
+    </script>
   </body>
 </html>
