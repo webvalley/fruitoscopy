@@ -48,13 +48,14 @@
       body {background-image: url({{url_for('static', filename='sfondo.jpg') }});}
       body {background-size: cover;
            background-attachment: fixed;}
+      a { text-decoration: none !important;}
     </style>
     <div class="body">
       <nav class="navbar navbar-default">
         <br>
         <div class="container-fluid fix row">
           <div class="navbar-header col-md-1">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
               <img alt="FBK" src="{{url_for('static', filename='logoFBK-2.jpg') }}">
             </a>
           </div>
@@ -82,9 +83,9 @@
                 <br>
               </a>
               <li role="separator" class="divider"></li>
-              <a href="get_db">
+              <a style="text-align: center" href="{{url_for('static', filename='samples.db') }}">
                 <br>
-                  <li>Get Data</li>
+                  <li>Download Data</li>
                 <br>
               </a>
               <li role="separator" class="divider"></li>

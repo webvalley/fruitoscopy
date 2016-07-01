@@ -1,21 +1,97 @@
-{% for row in rows %}
-<ul>
-    <li>
-        <p>ID: {{row[0]}}</p>
-    </li>
-    <li>
-        <p>Picker: {{row[1]}}</p>
-    </li>
-    <li>
-        <p>Field: {{row[2]}}</p>
-    </li>
-    <li>
-        <p>Time: {{row[3]}}</p>
-    </li>
-    <li>
-        <p>GPS: {{row[5]}}</p>
-    </li>
-</ul>
-<a href="../more_info/{{row[0]}}"><button>MORE INFO for ID {{row[0]}}</button></a>
-<br><br><br>
-{% endfor %}
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Database</title>
+
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  </head>
+
+  <body>
+
+  <style type="text/css">
+    .navbar-title {color: #337ab7;
+                  font-family: Arial;}
+    .col-md-4 {text-align: center;
+              padding: none;}
+    .navbar {margin-bottom: 0;
+            border: 0;}
+    .footer {background-color: #455a64;
+            height: 20%;
+            position: absolute;
+            left: 0;
+            bottom: auto;
+            right: 0;}
+    .body {min-height: 100%;
+          height: auto;
+          height: 100%;}
+    .push {height: 480px;
+          clear: both;}
+    .fix {padding-right: 0;
+         width: auto;
+         margin: 0;}
+    .fix2 {padding-left: 0;
+         padding-right: 0;
+         width: auto;}
+    td {text-align: center;}
+  </style>
+
+    <div class="body">
+      <nav class="navbar navbar-default">
+        <br>
+        <div class="container-fluid fix row">
+          <div class="navbar-header col-md-1">
+            <a class="navbar-brand" href="/">
+              <img alt="FBK" src="{{url_for('static', filename='logoFBK-2.jpg') }}">
+            </a>
+          </div>
+          <div class="col-md-4 fix2">
+            <centre>
+              <h1 class="navbar-title">Database</h1>
+            </centre>
+          </div>
+        </div>
+        <br>
+      </nav>
+
+      <br>
+
+    {% for row in rows %}
+      <table class="table table-bordered">
+        <br><br>
+        <tr>
+          <td class="active">
+              <p><b>ID:</b> {{row[0]}}</p>
+          </td>
+          <td>
+              <p><b>Picker:</b> {{row[1]}}</p>
+          </td>
+          <td class="active">
+              <p><b>Field:</b> {{row[2]}}</p>
+          </td>
+          <td>
+              <p><b>Time:</b> {{row[3]}}</p>
+          </td>
+          <td class="active">
+              <p><b>GPS:</b> {{row[5]}}</p>
+          </td>
+          <td>
+              <a href="../more_info/{{row[0]}}"><button><b>MORE INFO</b> for ID {{row[0]}}</button></a>
+          </td>
+        </tr>
+      </table>
+    {% endfor %}
+
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+  </body>
+
+</html>
