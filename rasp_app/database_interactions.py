@@ -181,3 +181,59 @@ def update_calib_params(params):
     con.commit()
     result = cur.fetchone()
     con.close()
+
+
+def get_spectrum_param():
+    """
+    This function receive as input nothing.
+    The return value is a tuple with all the parameters of the spectrum wavelenghts saved into the SQLite DB.
+
+    The purpose of this function is to get all the parameters needed by the image processing algorithm
+    so that those can be changed easily thanks to a database query.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Params:
+    ----------
+    :param 0: Blue position
+    :param 1: Red position
+    """
+
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("SELECT * FROM Params")
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchone()
+    con.close()
+    param = result
+    return param
+
+def update_spectrum_params(params):
+    """
+    This function receive as input the spectrum wavelenghts params to update into the database.
+    The return value is a tuple with all the parameters saved into the SQLite DB.
+
+    The purpose of this function is to update the parameters for the image processing.
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Params:
+    ----------
+    :param 0: Blue position
+    :param 1: Red position
+    """
+
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("DELETE FROM Spectrum")
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchone()
+    to_execute = ("INSERT INTO Spectrum VALUES (%d,%d)" % (params[0],params[1]))
+    cur.execute(to_execute)
+    con.commit()
+    result = cur.fetchone()
+    con.close()

@@ -1,18 +1,40 @@
-<center>
-  <img src="{{url_for('static', filename='processed.jpg')}}" style="width:60%;"/>
-</center>
-<form action="../calib_crop_rotate_done" method=post enctype=multipart/form-data>
-    <span>From left</span><input type=number name=param_0 value= {{param[0]}}>
+<html>
+  <head>
+  </head>
+  <body>
+    <center>
+      <img src="{{url_for('static', filename='processed.jpg')}}" style="width:60%;"/>
+    </center>
+    <span>From left</span><input type=number name=param_0 id=left value= {{param[0]}}>
     <br>
-    <span>From top</span><input type=number name=param_1 value= {{param[1]}}>
+    <span>From top</span><input type=number name=param_1 id=top value= {{param[1]}}>
     <br>
-    <span>From right</span><input type=number name=param_2 value= {{param[2]}}>
+    <span>From right</span><input type=number name=param_2 id=right value= {{param[2]}}>
     <br>
-    <span>From bottom</span><input type=number name=param_3 value= {{param[3]}}>
+    <span>From bottom</span><input type=number name=param_3 id=bott value= {{param[3]}}>
     <br>
-    <span>Rotation</span><input type=number name=param_4 value= {{param[4]}}>
+    <span>Rotation</span><input type=number name=param_4 id=rot value= {{param[4]}}>
     <br>
-    <button type="submit">Upload changes</button>
-</form>
-
-<a href="/"><button>Go back to index</button></a>
+    <button type="submit" id="submit" name="submit">Upload changes</button>
+    <br>
+    <br>
+    <a href="/"><button>Go back to index</button></a>
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script>
+        $("#submit").click(function(){
+            var posting = $.post(
+              '/calib_crop_rotate_done',
+                {param_0: $("#left").val(), param_1: $("#top").val(), param_2: $("#right").val(), param_3: $("#bott").val(), param_4: $("#rot").val()}
+            );
+            posting.done(function( data ) {
+                if(data=="OK"){
+                  location.reload();
+                }
+                else{
+                  alert("ERROR")
+                }
+            });
+        });
+    </script>
+  </body>
+</html>

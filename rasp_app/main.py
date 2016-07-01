@@ -279,18 +279,29 @@ def calib_crop_rotate():
 
 @app.route('/calib_crop_rotate_done', methods=['GET', 'POST'])
 def calib_crop_rotate_done():
+
     p_0 = int(request.form['param_0'])
     p_1 = int(request.form['param_1'])
     p_2 = int(request.form['param_2'])
     p_3 = int(request.form['param_3'])
     p_4 = int(request.form['param_4'])
+
     param = (p_0,p_1,p_2,p_3,p_4)
     update_calib_params(param)
+    return "OK"
     return render_template('calib_crop_rotate_done.html')
 
 @app.route('/calib_spectrum')
 def calib_spectrum():
-    return render_template('calib_spectrum.html')
+    return render_template('calib_spectrum.html', param=get_spectrum_param())
+
+@app.route('/calib_spectrum_done', methods=['GET', 'POST'])
+def calib_spectrum_done():
+    blue = int(request.form['blue'])
+    red = int(request.form['red'])
+    update_spectrum_params((blue,red))
+    return "OK"
+    return render_template('calib_spectrum_done.html', param=get_spectrum_param())
 
 
 if __name__ == "__main__":
