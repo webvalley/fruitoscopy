@@ -1,0 +1,27 @@
+<center>
+  <img src="{{url_for('static', filename='processed.jpg')}}" style="width:60%;"/>
+  <form action="../calib_spectrum_done" method=post enctype=multipart/form-data>
+      <span>Blue</span>
+      <br>
+      <input type=range name=blue style="width:60%;" min=0 max=1000 value={{param[0]}}>
+      <br>
+      <span>Red</span>
+      <br>
+      <input type=range name=red style="width:60%;" min=0 max=1000 value={{param[1]}}>
+      <br>
+      <button type="submit">Upload changes</button>
+  </form>
+</center>
+<script>
+$("#sync_timestamp").click(function(){
+    var posting = $.post(
+      '/sync_timestamp',
+        {timestamp: (Date.now()/1000)}
+    );
+    posting.done(function( data ) {
+        if(data=="OK"){
+            alert("Timestamp is now in sync");
+        }
+    });
+});
+</script>

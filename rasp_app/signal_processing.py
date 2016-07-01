@@ -116,6 +116,9 @@ def save_plot(array, wl=[]):
     if wl == []:
         wl = range(len(array))
     plt.clf();plt.plot(array,c='black')
+    f=open(HOME_PATH + '/static/spectrum.csv','a')
+    f.write(",".join(map(str, array))+'\n')
+    f.close()
     savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
 
 def get_image():
@@ -256,10 +259,10 @@ def process_image():
 
     background_rem,fn = remove_background(almost_good, wl, idx, deg = 3)
 
-    try:
-        save_plot(background_rem, wl)
-    except:
-        print("Unable to process plot")
+    #try:
+    save_plot(background_rem, wl)
+    #except:
+    #    print("Unable to process plot")
     return (0,background_rem)
     #except:
        #print("Unable to save image")

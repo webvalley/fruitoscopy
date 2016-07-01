@@ -290,8 +290,16 @@ def calib_crop_rotate_done():
 
 @app.route('/calib_spectrum')
 def calib_spectrum():
-    return render_template('calib_spectrum.html')
-
+    return render_template('calib_spectrum.html', param=get_spectrum_param())
+'''
+@app.route('/calib_spectrum_done', methods=['GET', 'POST'])
+def calib_spectrum():
+    blue = int(request.form['blue'])
+    red = int(request.form['red'])
+    update_spectrum_params((blue,red))
+    return "OK"
+    return render_template('calib_spectrum_done.html', param=get_spectrum_param())
+'''
 
 if __name__ == "__main__":
     """
