@@ -116,6 +116,12 @@
                   <li>Sync timestamp</li>
                 <br>
               </a>
+              <li role="separator" class="divider"></li>
+              <a id="reset_database" href="#">
+                <br>
+                  <li>Reset database</li>
+                <br>
+              </a>
             </ul>
           </div>
 
@@ -156,6 +162,17 @@
             posting.done(function( data ) {
                 if(data=="OK"){
                     alert("Timestamp is now in sync");
+                }
+            });
+        });
+        $("#reset_database").click(function(){
+            var posting = $.post(
+              '/reset_database',
+                {reset:"yes"}
+            );
+            posting.done(function( data ) {
+                if(data=="OK"){
+                    alert("Database has been cleaned");
                 }
             });
         });

@@ -194,8 +194,9 @@ def internal_server_error(error):
     """
     return render_template('500.html'), 500
 
-@app.route('/database_info')
-def show_database_info():
+@app.route('/database_info', defaults={'date_from': None, 'date_to': None})
+@app.route('/database_info/<date_from>/<date_to>')
+def show_database_info(date_from,date_to):
     """
     This function receive as input nothing.
     The return is the page that shows all the records of the samples in the database of the raspberry.
@@ -210,17 +211,15 @@ def show_database_info():
     ----------
     - The database HTML page
     """
-    try:
-        rows_a = get_from_database()
-    except:
-        print("Unable to get data from database")
-        return render_template('500.html'), 500
+    rows_a = get_from_database(date_from, date_to)
     rows = list(list(i) for i in rows_a)
 
     for i in range(len(rows)):
         rows[i][3] = datetime.datetime.fromtimestamp(rows[i][3]).strftime('%d-%m-%Y %H:%M:%S')
-
-    return render_template('show_database.html',rows=rows)
+    if(date_from != None and date_to != None):
+        return render_template('show_database.html',rows=rows,date_from=date_from, date_to=date_to)
+    else:
+        return render_template('show_database.html',rows=rows,date_from="2016-01-01", date_to="2042-01-01")
 
 
 @app.route('/more_info/<int:id_db>')

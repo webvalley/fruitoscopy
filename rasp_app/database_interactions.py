@@ -1,7 +1,8 @@
 import os
 from flask import Flask, request, redirect, url_for, flash, render_template
-from werkzeug.utils import secure_filename
+import shutil
 import time
+import datetime
 import sqlite3 as lite
 import numpy as np
 
@@ -36,7 +37,7 @@ def insert_in_database(picker,field,timestamp,spectrum,gps):
     con.commit()
     con.close()
 
-def get_from_database():
+def get_from_database(date_from, date_to):
     """
     This function has no input.
     The return is the tuple with all the information on the database.
@@ -59,6 +60,14 @@ def get_from_database():
     cur = con.cursor()
 
     to_execute = ("SELECT * FROM Samples")
+    if(date_from != None and date_to != None):
+        to_execute += " WHERE timestamp BETWEEN "
+        timestamp = time.mktime(datetime.datetime.strptime(date_from, "%Y-%m-%d").timetuple())
+        to_execute += str(int(timestamp))
+        to_execute += " AND "
+        timestamp = time.mktime(datetime.datetime.strptime(date_to, "%Y-%m-%d").timetuple())
+        to_execute += str(int(timestamp))
+
     cur.execute(to_execute)
     con.commit()
     result = cur.fetchall()
@@ -237,3 +246,6 @@ def update_spectrum_params(params):
     con.commit()
     result = cur.fetchone()
     con.close()
+
+def reset_database():
+    shutil.copy(HOME_PATH + "/databases/default.db", HOME_PATH + "/static/sampeles.db")

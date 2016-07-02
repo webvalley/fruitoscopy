@@ -63,6 +63,11 @@
       </nav>
 
       <br>
+    <center>
+      <span>From: <span><input type="date" name="from_date" id="from_date" value="{{date_from}}">
+      <span>   To: <span><input type="date" name="to_date" id="to_date" value="{{date_to}}">
+      <button id="search_date">Search</button>
+    </center>
 
     {% for row in rows %}
       <table class="table table-bordered">
@@ -92,6 +97,11 @@
 
     <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+    $("#search_date").click(function(){
+        window.location.href = "/database_info/"+ $("#from_date").val() + "/" + $("#to_date").val();
+    });
+    </script>
   </body>
 
 </html>

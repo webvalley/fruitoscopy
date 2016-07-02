@@ -5,6 +5,7 @@ import time
 import sqlite3 as lite
 from signal_processing import *
 import scipy.signal as sps
+import scipy.optimize as opt
 from matplotlib.pylab import savefig
 from PIL import Image
 import numpy as np
@@ -45,7 +46,7 @@ def mins(array,wl):
         prev = der[x-1]
     return min_vals
 
-def remove_background(spectrum, wl=[], idx=[], deg=1):
+def remove_background(spectrum):
     """
     This function receive as input the spectrum, the wavelenghts, the minima points and the deg to compute the regression line.
     The return value is the label and the normalized spectrum
@@ -91,9 +92,9 @@ def remove_background(spectrum, wl=[], idx=[], deg=1):
     '''
     min_height = min(spectrum)
 
-    normalized =  np.array(spectrum)
-    normalized -= min_height
-    return (normalized,0)
+    background_rem =  np.array(spectrum)
+    background_rem -= min_height
+    return (background_rem,0)
 
 def save_plot(array, wl=[]):
     """
@@ -115,7 +116,7 @@ def save_plot(array, wl=[]):
     """
     if wl == []:
         wl = range(len(array))
-    plt.clf();plt.plot(array,c='black')
+    plt.clf();plt.plot(wl,array,c='black')
     #Uncomment to save csv arrays
     #f=open(HOME_PATH + '/static/spectrum.csv','a')
     #f.write(",".join(map(str, array))+'\n')
@@ -147,6 +148,11 @@ def get_image():
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
     im.save(HOME_PATH + '/static/processed.jpg')
+
+    #Better not to resize, data is lost or altered too much
+    #maxsize = (1000, im.size[0])
+    #im = im.resize(maxsize, Image.ANTIALIAS)
+
     #im.show()
     img_spectrum = im.load()
     return img_spectrum
@@ -182,7 +188,7 @@ def get_baseline(img_spectrum):
     param=get_params()
     rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]);
     tot = [[] for x in range(param[2]-param[0])]
-    for col in range(0,param[2]-param[0],1):
+    for col in range(param[2]-param[0]):
         count=[0.,0.,0.]
 
         for row in range(0,param[3]-param[1],1):
@@ -220,27 +226,77 @@ def process_image():
 
     #param = (800,1000,2400,1250,5) #left,top,right,bottom, rotate
     param = get_params()
-    try:
-        img_spectrum = get_image()
-    except:
-        print("Unable to get image from source")
-        return 0
+    img_spectrum = get_image()
 
     black_line = get_baseline(img_spectrum)
-
-    almost_good = sps.detrend(black_line)
+    #plt.plot(black_line, color="green")
+    #remove_noise(black_line)
+    #almost_good = sps.detrend(black_line)
+    #plt.plot(almost_good, color="black")
     almost_good = sps.savgol_filter(black_line, 51, 3)
-
-    wl = np.array(range(len(almost_good)))
+    #plt.plot(almost_good, color="red")
+    #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
+    wl = np.array(range(400,1000))
     idx = mins(almost_good,wl)
 
-    background_rem,fn = remove_background(almost_good, wl, idx, deg = 3)
+    background_rem,fn = remove_background(almost_good)
 
-    #try:
-    save_plot(background_rem, wl)
-    #except:
-    #    print("Unable to process plot")
-    return (0,background_rem)
-    #except:
-       #print("Unable to save image")
-        #return 0
+    normalized = normalize(background_rem, wl)
+    plt.plot(background_rem)
+    #plt.plot(normalized)
+    #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
+    save_plot(normalized, wl)
+    return (0,normalized)
+
+def normalize(array, wl):
+    """
+    This functions get in input the array that has been calculated by the image
+    and then returns the correct array based on the wavelenghts.
+
+    This because the number of the points in the array of the wavelenghts is not
+    equal to the number of the points of the spectrum taken from the image.
+    (Depends on the number of pixels and the calibration)
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Values in input:
+    ----------
+    :value 0: Array of the y values of the spectrum
+    :value 1: Array of x values of the wavelenghts
+
+    :Return values:
+    ----------
+    :value 0: The array of the normalized spectrum
+
+    """
+
+    ##To check, because math is not magic and this function worked too easily
+
+    min_wl = np.amin(wl)
+    max_wl = np.amax(wl)
+    len_arr = len(array)
+    normalized = []
+    count = 0
+    if(max_wl-min_wl < len_arr):
+        to_delete = (max_wl-min_wl)/(len_arr-max_wl+min_wl)
+        for i in range(len(array)):
+            if int(i%(to_delete+1)) != 0:
+                normalized.append(array[i])
+            else:
+                count +=1
+        if(len(normalized) < max_wl-min_wl+1):
+            normalized.append(normalized[-1])
+    else:
+        to_add = (max_wl-min_wl)/(max_wl-min_wl-len_arr)
+        for i in range(len(array)):
+            if int(i%(to_add-1)) == 0:
+                normalized.append((array[i]+array[i-1])/2)
+                count +=1
+            normalized.append(array[i])
+        if(len(normalized)<max_wl-min_wl+1):
+            normalized.append(normalized[-1])
+    #print(count) #Check how many removed/added
+    #print("AAAAAAA: %d" % len(normalized))
+    #print("BBBBBBB: %d" % (max_wl-min_wl))
+    return np.array(normalized)
