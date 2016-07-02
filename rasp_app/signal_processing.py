@@ -181,38 +181,18 @@ def get_baseline(img_spectrum):
     """
     param=get_params()
     rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]);
+    tot = [[] for x in range(param[2]-param[0])]
     for col in range(0,param[2]-param[0],1):
         count=[0.,0.,0.]
+
         for row in range(0,param[3]-param[1],1):
             #b,g,r = img_spectrum[row,col]
             r,g,b = img_spectrum[col,row]
-            if b>10:
-                bl[col]+=b/255.
-                count[0]+=1.
-            if g>10:
-                gl[col]+=g/255.
-                count[1]+=1.
-            if r>10:
-                rl[col]+=r/255.
-                count[2]+=1.
-        if count[2]>0.:
-            rl[col]=rl[col]/count[2]
-        if count[1]>0.:
-            gl[col]=gl[col]/count[1]
-        if count[0]>0.:
-            bl[col]=bl[col]/count[0]
-        '''
-        if(col != 0):
-            rl[col-1] = rl[col]
-            gl[col-1] = gl[col]
-            bl[col-1] = bl[col]
+            tot[col].append(r+g+b)
 
-        if(col == param[2]-param[0]-2):
-            rl[col+1] = rl[col]
-            gl[col+1] = gl[col]
-            bl[col+1] = bl[col]
-        '''
-    black_line = [round((rl[i]+gl[i]+bl[i])/3.,4) for i in range(len(rl))]
+    black_line = []
+    for elem in tot:
+        black_line.append(max(elem))
     return black_line
 
 def process_image():
@@ -246,11 +226,7 @@ def process_image():
         print("Unable to get image from source")
         return 0
 
-    try:
-        black_line = get_baseline(img_spectrum)
-    except:
-        print("Unable to calculate baseline")
-        return 0
+    black_line = get_baseline(img_spectrum)
 
     almost_good = sps.detrend(black_line)
     almost_good = sps.savgol_filter(black_line, 51, 3)
