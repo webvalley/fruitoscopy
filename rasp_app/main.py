@@ -104,13 +104,16 @@ def data_taken():
     gps = "n/d"
     timestamp = time_now()
     processed = process_image()
+    if(processed[0] == -1):
+        return "CALIBRATION DONE"
     spectrum = processed[1].tolist()
     insert_in_database(picker, field, timestamp, spectrum,gps)
     if processed[0]:
         result = "IS RIPE"
     else:
         result = "NOT RIPE YET"
-    return render_template('data_taken.html', field=field, result=result)
+    return "OK"
+    #return render_template('data_taken.html', field=field, result=result)
 
 @app.route('/take_data/<int:field>')
 def take_data(field):
@@ -273,7 +276,7 @@ def calib_index():
 
 @app.route('/calib_crop_rotate', methods=['GET', 'POST'])
 def calib_crop_rotate():
-    get_image()
+
     return render_template('calib_crop_rotate.html',param=get_params())
 
 @app.route('/calib_crop_rotate_done', methods=['GET', 'POST'])
@@ -287,20 +290,23 @@ def calib_crop_rotate_done():
 
     param = (p_0,p_1,p_2,p_3,p_4)
     update_calib_params(param)
+    get_image()
     return "OK"
     return render_template('calib_crop_rotate_done.html')
 
 @app.route('/calib_spectrum')
 def calib_spectrum():
-    return render_template('calib_spectrum.html', param=get_spectrum_param())
+    return render_template('calib_spectrum.html', param=get_spectrum_param(), dim =get_params())
 
 @app.route('/calib_spectrum_done', methods=['GET', 'POST'])
 def calib_spectrum_done():
     blue = int(request.form.get('blue'))
     red = int(request.form.get('red'))
+    if(blue == None or red == None):
+        return "ERROR"
     update_spectrum_params((blue,red))
     return "OK"
-    return render_template('calib_spectrum_done.html', param=get_spectrum_param())
+    #return render_template('calib_spectrum_done.html', param=get_spectrum_param())
 
 
 if __name__ == "__main__":

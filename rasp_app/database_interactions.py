@@ -211,7 +211,7 @@ def get_spectrum_param():
 
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
-    to_execute = ("SELECT * FROM Params")
+    to_execute = ("SELECT * FROM Spectrum")
     cur.execute(to_execute)
     con.commit()
     result = cur.fetchone()
@@ -234,7 +234,7 @@ def update_spectrum_params(params):
     :param 0: Blue position
     :param 1: Red position
     """
-
+    print ("%d %d" % (params[0],params[1]))
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("DELETE FROM Spectrum")

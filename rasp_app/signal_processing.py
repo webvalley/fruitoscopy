@@ -236,12 +236,14 @@ def process_image():
     almost_good = sps.savgol_filter(black_line, 51, 3)
     #plt.plot(almost_good, color="red")
     #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
-    wl = np.array(range(400,1000))
+    wl = np.array(range(400,801))
     idx = mins(almost_good,wl)
 
     background_rem,fn = remove_background(almost_good)
 
     normalized = normalize(background_rem, wl)
+    if(normalized.any() == -1):
+        return -1, -1
     plt.plot(background_rem)
     #plt.plot(normalized)
     #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
@@ -278,6 +280,41 @@ def normalize(array, wl):
     len_arr = len(array)
     normalized = []
     count = 0
+    param = get_spectrum_param()
+    diff_param = param[1] - param[0]
+
+    begin = param[0] - diff_param * 0.375
+    end = param[1] + diff_param * 0.625
+
+    begin_px = int(begin*len(array)/1000)
+    end_px = int(end*len(array)/1000)
+
+    if(begin_px < 0 or end_px > len_arr):
+        dim = get_params()
+        if(begin_px < 0 and end_px > len_arr):
+            diff_begin = -begin_px
+            diff_end = end_px - len_arr
+            update_calib_params((dim[0]-diff_begin-10,dim[1],dim[2]+diff_end+10,dim[3],dim[4]))
+            #update_spectrum_params(((param[0]-int(diff_begin*len(array)/1000)), param[1]+int(diff_end*len(array)/1000)))
+            return -1
+        elif(begin_px < 0):
+            diff_begin = -begin_px
+            update_calib_params((dim[0]-diff_begin-10,dim[1],dim[2],dim[3],dim[4]))
+            #update_spectrum_params(((param[0]-int(diff_begin*len(array)/1000)), (param[1])))
+            return -1
+        elif(end_px > len_arr):
+            diff_end = end_px - len_arr
+            update_calib_params((dim[0],dim[1],dim[2]+diff_end+10,dim[3],dim[4]))
+            #update_spectrum_params(((param[0]), param[1]+int(diff_end*len(array)/1000)))
+            return -1
+
+    new_list = array[:]
+    #print(int(begin*len(array)/1000))
+    #print(int(end*len(array)/1000))
+    #print(len(new_list))
+    array = new_list
+    len_arr = len(array)
+
     if(max_wl-min_wl < len_arr):
         to_delete = (max_wl-min_wl)/(len_arr-max_wl+min_wl)
         for i in range(len(array)):
