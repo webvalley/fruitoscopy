@@ -11,6 +11,7 @@ from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 from database_interactions import *
+from machine_learning import *
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -94,7 +95,8 @@ def remove_background(spectrum):
 
     background_rem =  np.array(spectrum)
     background_rem -= min_height
-    return (background_rem,0)
+
+    return (background_rem)
 
 def save_plot(array, wl=[]):
     """
@@ -229,14 +231,14 @@ def process_image():
     img_spectrum = get_image()
 
     black_line = get_baseline(img_spectrum)
-    plt.plot(black_line, color="blue")
+    #plt.plot(black_line, color="blue")
     almost_good = sps.savgol_filter(black_line, 51, 3)
-    plt.plot(almost_good, color="red")
-    savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
+    #plt.plot(almost_good, color="red")
+    #savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
     wl = np.array(range(400,801))
     idx = mins(almost_good,wl)
 
-    background_rem,fn = remove_background(almost_good)
+    background_rem = remove_background(almost_good)
 
     normalized = normalize(background_rem, wl)
     try:
@@ -250,6 +252,9 @@ def process_image():
     #plt.plot(normalized)
     #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
     save_plot(normalized, wl)
+
+    get_label(normalized)
+    
     return (0,normalized)
 
 def normalize(array, wl):
@@ -275,7 +280,7 @@ def normalize(array, wl):
 
     """
     ##This part cuts the initial array and depending on the wl calibration parameters
-    ##in order to take only the part between 400 and 800 nm
+    ##in order to take only the part between 400 and 1000 nm
 
     min_wl = np.amin(wl)
     max_wl = np.amax(wl)

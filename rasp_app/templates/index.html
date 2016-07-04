@@ -117,7 +117,8 @@
                 <br>
               </a>
               <li role="separator" class="divider"></li>
-              <a id="reset_database" href="#">
+
+              <a data-toggle="modal" data-target="#myModal" href="#">
                 <br>
                   <li>Reset database</li>
                 <br>
@@ -150,6 +151,28 @@
         </div>
       </footer>
 
+      <!-- Modal -->
+      <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body" id="modal_body">
+              <p>Do you want to delete only the samples recorded or the entire database (also calibration parameters)?</p>
+              <button type="button" class="btn btn-default" style="color:green;" id="reset_samples">Only the sample</button>
+              <button type="button" class="btn btn-default" style="color:red;" id="reset_database">Entire database</button>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
     <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
@@ -166,15 +189,30 @@
             });
         });
         $("#reset_database").click(function(){
+          if (confirm("This will delete all the data and calibrations. Are you sure to continue anyway?")) {
             var posting = $.post(
               '/reset_database',
-                {reset:"yes"}
+                {reset:"entire_database"}
             );
             posting.done(function( data ) {
                 if(data=="OK"){
-                    alert("Database has been cleaned");
+                    alert("Entire Database has been cleaned");
                 }
             });
+          }
+        });
+        $("#reset_samples").click(function(){
+          if (confirm("Delete all the samples?")) {
+            var posting = $.post(
+              '/reset_database',
+                {reset:"only_samples"}
+            );
+            posting.done(function( data ) {
+                if(data=="OK"){
+                    alert("Sample Database has been cleaned");
+                }
+            });
+          }
         });
     </script>
   </body>

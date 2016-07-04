@@ -65,9 +65,6 @@ def update_time(timestamp):
     out_file.write(str(diff_time))
     out_file.close()
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
 @app.route('/db_uploaded', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -106,24 +103,24 @@ def data_taken():
     TODO: return also machine learning prediction
     """
 
-    field = int(request.form['field'])
-    picker = 1
+    fruit = int(request.form['fruit'])
     gps = "n/d"
-    timestamp = time_now()
+    tmstp = time_now()
     processed = process_image()
     if(processed[0] == -1):
         return "CALIBRATION DONE"
     spectrum = processed[1].tolist()
-    insert_in_database(picker, field, timestamp, spectrum,gps)
     if processed[0]:
         result = "IS RIPE"
     else:
         result = "NOT RIPE YET"
+    insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
     return "OK"
     #return render_template('data_taken.html', field=field, result=result)
 
-@app.route('/take_data/<int:field>')
-def take_data(field):
+@app.route('/take_data', defaults={'fruit': 1})
+@app.route('/take_data/<int:fruit>')
+def take_data(fruit):
     """
     This function receive as input (POST request) the number of the field where the picker is working.
     The return is the page that confirm the row of the id has been deleted from the database.
@@ -141,7 +138,7 @@ def take_data(field):
     ----------
     - The confirmation HTML page
     """
-    return render_template('take_data.html', field=field)
+    return render_template('take_data.html', fruit=fruit)
 
 
 @app.route('/sync_timestamp', methods=['GET', 'POST'])
@@ -225,15 +222,15 @@ def show_database_info(date_from,date_to):
     rows = list(list(i) for i in rows_a)
 
     for i in range(len(rows)):
-        rows[i][3] = datetime.datetime.fromtimestamp(rows[i][3]).strftime('%d-%m-%Y %H:%M:%S')
+        rows[i][5] = datetime.datetime.fromtimestamp(rows[i][5]).strftime('%d-%m-%Y %H:%M:%S')
     if(date_from != None and date_to != None):
         return render_template('show_database.html',rows=rows,date_from=date_from, date_to=date_to)
     else:
         return render_template('show_database.html',rows=rows,date_from="2016-01-01", date_to=datetime.datetime.fromtimestamp(time_now()).strftime('%Y-%m-%d'))
 
 
-@app.route('/more_info/<int:id_db>')
-def show_more_info(id_db):
+@app.route('/more_info', methods=['GET', 'POST'])
+def show_more_info():
     """
     This function receive as input the id of the database.
     The return is the page with the informations about the data of the sample that has been requested.
@@ -252,19 +249,14 @@ def show_more_info(id_db):
     ----------
     - The HTML page with all the informations about the sample (and te spectrum)
     """
-    try:
-        spectrum = get_data_by_id(id_db)
-    except:
-        print("Unable to get spectrum from database")
-        return render_template('500.html'), 500
-
-    #try:
+    id_db = p_0 = int(request.form['id'])
+    data = get_data_by_id(id_db)
+    spectrum =  data[1].split(",")
     spectrum = [float(x) for x in spectrum]
-    save_plot(spectrum)
-    #except:
-        #print("Unable to save plot")
+    save_plot(spectrum, range(400,801))
 
-    return render_template('more_info_from_row.html', id_db=id_db)
+    return ("OK,%d,%d,%s,%d,%d,%d" % (data[2],data[3],data[4],data[5],data[6],data[7]))
+    #return render_template('more_info_from_row.html', id_db=id_db)
 
 @app.route('/delete_data/<int:id_db>')
 def delete_data(id_db):
@@ -314,9 +306,21 @@ def calib_spectrum_done():
     return "OK"
     #return render_template('calib_spectrum_done.html', param=get_spectrum_param())
 
+@app.route('/reset_database', methods=['GET', 'POST'])
+def reset_database_route():
+    reset = request.form.get('reset')
+    if(reset == 'entire_database'):
+        reset_all_database()
+    elif(reset == 'only_samples'):
+        reset_samples()
+    return "OK"
+    #return render_template('calib_spectrum_done.html', param=get_spectrum_param())
+
 
 if __name__ == "__main__":
     """
     Just start the server open to everyone, on the port 5000
     """
+    if(not os.path.isfile(HOME_PATH + '/static/samples.db')):
+        create_database_first_time()
     app.run(host='0.0.0.0')

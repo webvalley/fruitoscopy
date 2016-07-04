@@ -1,6 +1,5 @@
 import os
 from flask import Flask, request, redirect, url_for, flash, render_template
-import shutil
 import time
 import datetime
 import sqlite3 as lite
@@ -8,7 +7,7 @@ import numpy as np
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
-def insert_in_database(picker,field,timestamp,spectrum,gps):
+def insert_in_database(spectrum, fruit, label, gps, tmstp):
     """
     This function receive as input the information about what to insert as a new row into the database
     This function has no return.
@@ -30,9 +29,15 @@ def insert_in_database(picker,field,timestamp,spectrum,gps):
     ----------
     - The HTML page with all the informations about the sample (and te spectrum)
     """
+
+
+    ml_model = 0
+    sp_model = 0
+
+
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
-    to_execute = ("INSERT INTO Samples (picker,field,timestamp,spectrum,gps) VALUES (%d,%d,%d,\"%s\",\"%s\")" % (picker,field,timestamp,",".join(map(str, spectrum)),gps))
+    to_execute = ("INSERT INTO Samples (spectrum,fruit,label,gps,tmstp,ml_model,sp_model) VALUES (\"%s\",%d,%d,\"%s\",%d,%d,%d)" % (",".join(map(str, spectrum)),fruit,label,gps,tmstp,ml_model,sp_model))
     cur.execute(to_execute)
     con.commit()
     con.close()
@@ -100,9 +105,8 @@ def get_data_by_id(id_db):
     con.commit()
     result = cur.fetchone()
     con.close()
-    spectrum = result[4].split(",")
     #print(spectrum[1])
-    return spectrum
+    return result
 
 def delete_data_by_id(id_db):
     """
@@ -178,7 +182,7 @@ def update_calib_params(params):
     :param 3: Bottom margin of image to crop
     :param 4: Degrees to rotate the image (+ is CCW)
     """
-    print(params)
+    #print(params)
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("DELETE FROM Params")
@@ -247,5 +251,32 @@ def update_spectrum_params(params):
     result = cur.fetchone()
     con.close()
 
-def reset_database():
-    shutil.copy(HOME_PATH + "/databases/default.db", HOME_PATH + "/static/sampeles.db")
+def reset_samples():
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("DELETE FROM Samples")
+    cur.execute(to_execute)
+    con.commit()
+    con.close()
+
+def reset_all_database():
+    reset_samples()
+    update_calib_params((300,300,2200,3000,0))
+    update_spectrum_params((300,600))
+    return 1;
+
+def create_database_first_time():
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("CREATE TABLE Samples (id INTEGER PRIMARY KEY AUTOINCREMENT, spectrum VARCHAR, fruit INTEGER, label INTEGER, gps INTEGER, tmstp INTEGER, ml_model INTEGER, sp_model INTEGER)")
+    cur.execute(to_execute)
+    to_execute = ("CREATE TABLE Spectrum (Blue INTEGER, Red INTEGER)")
+    cur.execute(to_execute)
+    to_execute = ("CREATE TABLE Params (CropLeft INTEGER, CropTop INTEGER, CropRight INTEGER, CropBottom INTEGER, Rotate INTEGER)")
+    cur.execute(to_execute)
+    to_execute = ("INSERT INTO Spectrum VALUES (300,600)")
+    cur.execute(to_execute)
+    to_execute = ("INSERT INTO Params VALUES (300,300,2200,3000,0)")
+    cur.execute(to_execute)
+    con.commit()
+    con.close()

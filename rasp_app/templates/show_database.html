@@ -77,23 +77,42 @@
               <p><b>ID:</b> {{row[0]}}</p>
           </td>
           <td>
-              <p><b>Picker:</b> {{row[1]}}</p>
+              <p><b>Fruit:</b> {{row[2]}}</p>
           </td>
           <td class="active">
-              <p><b>Field:</b> {{row[2]}}</p>
+              <p><b>Label:</b> {{row[3]}}</p>
           </td>
           <td>
-              <p><b>Time:</b> {{row[3]}}</p>
+              <p><b>Time:</b> {{row[5]}}</p>
           </td>
           <td class="active">
-              <p><b>GPS:</b> {{row[5]}}</p>
+              <p><b>GPS:</b> {{row[4]}}</p>
           </td>
           <td>
-              <a href="../more_info/{{row[0]}}"><button><b>MORE INFO</b> for ID {{row[0]}}</button></a>
+              <a href="#"><button data-toggle="modal" data-target="#myModal" onclick="more_info({{row[0]}})"><b>MORE INFO</b> for ID {{row[0]}}</button></a>
           </td>
         </tr>
       </table>
     {% endfor %}
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">More data</h4>
+          </div>
+          <div class="modal-body" id="modal_body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
 
     <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
@@ -106,6 +125,29 @@
         window.location.href = "/database_info/"+ $("#from_date").val() + "/" + $("#to_date").val();
       }
     });
+    function more_info(id_db){
+      var posting = $.post(
+        '/more_info',
+          {id: id_db}
+      );
+      posting.done(function( data ) {
+          var res = data.split(",");
+
+          if(res[0]=="OK"){
+            var html = '<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">'
+            html += '<br><span>Fruit: ' + res[1] + '</span>'
+            html += '<br><span>Label: ' + res[2] + '</span>'
+            html += '<br><span>GPS: ' + res[3] + '</span>'
+            html += '<br><span>Timestamp: ' + res[4] + '</span>'
+            html += '<br><span>ML_model: ' + res[5] + '</span>'
+            html += '<br><span>SP_model: ' + res[6] + '</span>'
+            $('#modal_body').html(html);
+          }
+          else{
+            alert("ERROR");
+          }
+      });
+    }
     </script>
   </body>
 

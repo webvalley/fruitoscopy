@@ -80,7 +80,7 @@
         <tr>
           <td><b style="font-size:160%;"><label for="field">Select variety:</label></b></td>
           <td>
-            <select class="form-control" name="field" id="field" value= {{field}}>
+            <select class="form-control" name="fruit" id="fruit" value= {{fruit}}>
               <option value="1">Raspberry</option>
               <option value="2">Grape</option>
             </select>
@@ -107,7 +107,7 @@
     $("#take_sample").click(function(){
         var posting = $.post(
           '/data_taken',
-            {field: $("#field").val()}
+            {fruit: $("#fruit").val()}
         );
         posting.done(function( data ) {
             if(data=="OK"){

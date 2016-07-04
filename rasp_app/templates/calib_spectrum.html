@@ -24,8 +24,8 @@
             right: 0;}
       span {font-weight: 600; font-size:160%;}
     </style>
+    <body onload="get_first_image()">
   </head>
-  <body onload="update_canvas()">
     <nav class="navbar navbar-default">
       <br>
       <div>
@@ -46,7 +46,9 @@
       <canvas id="spectrum_canvas" style="width: 99%;margin-left:0.75%;margin-right:0.25%;">
       Your browser does not support CANVAS :(
       </canvas>
-      <img id="spectrum_img" src="{{url_for('static', filename='processed.jpg')}}" style="width:100%;display:none;"/>
+      <div id="img_div">
+        <img id="spectrum_img" src="/static/processed.jpg" style="width:100%;display:none;"/>
+      </div>
       <hr style="border: #c5c1be solid 2px!important;">
       <div style="text-align:center;"><span>Blue</span></div><br>
       <input type=range name=blue id="blue" style="width:100%;" min=0 max=1000 value={{param[0]}} onchange="update_canvas()">
@@ -90,7 +92,10 @@
             }
         });
     });
-
+    function get_first_image(){
+      $('#img_div').html("<img id=\"spectrum_img\" src=\"/static/processed.jpg?"+ new Date().getTime() +"\" style=\"width:100%;display:none;\" onload=\"update_canvas()\"/>");
+      //$('#spectrum_img').onload = update_canvas();
+    }
     function update_canvas(){
       var c = document.getElementById("spectrum_canvas");
       $('#spectrum_canvas').css('height', $('#spectrum_canvas').width()/4 + 'px');
