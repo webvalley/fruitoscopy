@@ -101,7 +101,7 @@ def get_data_by_id(id_db):
     result = cur.fetchone()
     con.close()
     spectrum = result[4].split(",")
-    print(spectrum[1])
+    #print(spectrum[1])
     return spectrum
 
 def delete_data_by_id(id_db):
@@ -178,7 +178,7 @@ def update_calib_params(params):
     :param 3: Bottom margin of image to crop
     :param 4: Degrees to rotate the image (+ is CCW)
     """
-
+    print(params)
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("DELETE FROM Params")
@@ -234,7 +234,7 @@ def update_spectrum_params(params):
     :param 0: Blue position
     :param 1: Red position
     """
-    print ("%d %d" % (params[0],params[1]))
+    #print ("%d %d" % (params[0],params[1]))
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("DELETE FROM Spectrum")

@@ -99,6 +99,13 @@ def upload_file():
 
 @app.route('/data_taken', methods=['GET', 'POST'])
 def data_taken():
+    """
+    Process the request from the data_take page
+    Returns OK if the process has been executed correctly
+
+    TODO: return also machine learning prediction
+    """
+
     field = int(request.form['field'])
     picker = 1
     gps = "n/d"
@@ -222,7 +229,7 @@ def show_database_info(date_from,date_to):
     if(date_from != None and date_to != None):
         return render_template('show_database.html',rows=rows,date_from=date_from, date_to=date_to)
     else:
-        return render_template('show_database.html',rows=rows,date_from="2016-01-01", date_to="2042-01-01")
+        return render_template('show_database.html',rows=rows,date_from="2016-01-01", date_to=datetime.datetime.fromtimestamp(time_now()).strftime('%Y-%m-%d'))
 
 
 @app.route('/more_info/<int:id_db>')
@@ -265,22 +272,21 @@ def delete_data(id_db):
     This function is just the route to the delete_data function.
     The documentation about the deletion of the data can be found there.
     """
-
     delete_data_by_id(id_db)
-
     return render_template('row_deleted.html')
-
-@app.route('/calib')
-def calib_index():
-    return render_template('calib_index.html')
 
 @app.route('/calib_crop_rotate', methods=['GET', 'POST'])
 def calib_crop_rotate():
-
+    """
+    Returns the index page for area calibration
+    """
     return render_template('calib_crop_rotate.html',param=get_params())
 
 @app.route('/calib_crop_rotate_done', methods=['GET', 'POST'])
 def calib_crop_rotate_done():
+    """
+    Gets the data from the area calibration page and upload them into the database
+    """
 
     p_0 = int(request.form['param_0'])
     p_1 = int(request.form['param_1'])

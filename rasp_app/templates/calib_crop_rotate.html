@@ -26,11 +26,11 @@
       .col-md-4 {text-align: center;
                 padding: none;}
       b {color: #ffffff;}
-      span {font-weight: 600; font-size:120%;}
+      span {font-weight: 600; font-size:160%;}
     </style>
   </head>
 
-  <body>
+  <body onload="get_new_image()">
       <nav class="navbar navbar-default">
         <br>
         <div>
@@ -112,16 +112,21 @@
           posting.done(function( data ) {
               if(data=="OK"){
                 //location.reload();
-                $('#spectrum_div').html("<img src='/static/processed.jpg?"+ new Date().getTime()+"' style='width:60%;'/>")
+                get_new_image()
                 //$('#spectrum_img').attr("src", "/static/processed.jpg?" );
               }
               else{
                 alert("ERROR")
               }
           });
-        }
-        //$("#submit").click(
-        //});
+      }
+
+      //$("#submit").click(
+      //});
+
+      function get_new_image(){
+        $('#spectrum_div').html("<img src='/static/processed.jpg?"+ new Date().getTime()+"' style='width:60%;'/>")
+      }
 
       </script>
     </body>

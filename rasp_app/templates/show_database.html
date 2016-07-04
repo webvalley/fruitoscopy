@@ -99,7 +99,12 @@
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
     $("#search_date").click(function(){
+      if($("#from_date").val().len == null || $("#to_date").val().len==null){
+        alert("Cannot search between undefined dates");
+      }
+      else{
         window.location.href = "/database_info/"+ $("#from_date").val() + "/" + $("#to_date").val();
+      }
     });
     </script>
   </body>

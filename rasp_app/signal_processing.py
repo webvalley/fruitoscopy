@@ -229,21 +229,23 @@ def process_image():
     img_spectrum = get_image()
 
     black_line = get_baseline(img_spectrum)
-    #plt.plot(black_line, color="green")
-    #remove_noise(black_line)
-    #almost_good = sps.detrend(black_line)
-    #plt.plot(almost_good, color="black")
+    plt.plot(black_line, color="blue")
     almost_good = sps.savgol_filter(black_line, 51, 3)
-    #plt.plot(almost_good, color="red")
-    #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
+    plt.plot(almost_good, color="red")
+    savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
     wl = np.array(range(400,801))
     idx = mins(almost_good,wl)
 
     background_rem,fn = remove_background(almost_good)
 
     normalized = normalize(background_rem, wl)
-    if(normalized.any() == -1):
-        return -1, -1
+    try:
+        if(normalized.any() == -1):
+            return -1, -1
+    except:
+        if(normalized == -1):
+            get_image()
+            return -1, -1
     plt.plot(background_rem)
     #plt.plot(normalized)
     #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
@@ -268,12 +270,12 @@ def normalize(array, wl):
     :value 1: Array of x values of the wavelenghts
 
     :Return values:
-    ----------
-    :value 0: The array of the normalized spectrum
+    :value 0: The array of the normalized spectrum, Returns -1 if the area
+                is wrong and needs to be calibrated
 
     """
-
-    ##To check, because math is not magic and this function worked too easily
+    ##This part cuts the initial array and depending on the wl calibration parameters
+    ##in order to take only the part between 400 and 800 nm
 
     min_wl = np.amin(wl)
     max_wl = np.amax(wl)
@@ -288,8 +290,14 @@ def normalize(array, wl):
 
     begin_px = int(begin*len(array)/1000)
     end_px = int(end*len(array)/1000)
+    #print(begin_px)
+
+    ##If the area is too little to get the data from all the wl points
+    ##minimaze the error making an automatic calibration, returning an error
+    ## (Area calibration is done, now the user must calibrate the wl)
 
     if(begin_px < 0 or end_px > len_arr):
+        #print("error")
         dim = get_params()
         if(begin_px < 0 and end_px > len_arr):
             diff_begin = -begin_px
@@ -308,12 +316,16 @@ def normalize(array, wl):
             #update_spectrum_params(((param[0]), param[1]+int(diff_end*len(array)/1000)))
             return -1
 
-    new_list = array[:]
-    #print(int(begin*len(array)/1000))
-    #print(int(end*len(array)/1000))
-    #print(len(new_list))
+    new_list = array[begin_px:end_px]
+
     array = new_list
     len_arr = len(array)
+
+    ##To check, because math is not magic and this function worked too easily
+    ##Now that the "good spectrum" between the desired wl is saved, a compression
+    ##or dilation is needed in order to have a point for every wl nm
+
+    ##This is done by removing the points in excess or adding new points by average
 
     if(max_wl-min_wl < len_arr):
         to_delete = (max_wl-min_wl)/(len_arr-max_wl+min_wl)
@@ -333,6 +345,7 @@ def normalize(array, wl):
             normalized.append(array[i])
         if(len(normalized)<max_wl-min_wl+1):
             normalized.append(normalized[-1])
+
     #print(count) #Check how many removed/added
     #print("AAAAAAA: %d" % len(normalized))
     #print("BBBBBBB: %d" % (max_wl-min_wl))
