@@ -316,6 +316,12 @@ def reset_database_route():
     return "OK"
     #return render_template('calib_spectrum_done.html', param=get_spectrum_param())
 
+@app.route('/update_label', methods=['GET', 'POST'])
+def update_label():
+    id = request.form.get('id')
+    label = request.form.get('label')
+    label_update_db(id,label)
+    return "OK"
 
 if __name__ == "__main__":
     """
@@ -323,4 +329,8 @@ if __name__ == "__main__":
     """
     if(not os.path.isfile(HOME_PATH + '/static/samples.db')):
         create_database_first_time()
+    if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
+        out_file = open(HOME_PATH + "/timestamp.txt","w")
+        out_file.write(str(0))
+        out_file.close()
     app.run(host='0.0.0.0')

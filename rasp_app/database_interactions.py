@@ -280,3 +280,11 @@ def create_database_first_time():
     cur.execute(to_execute)
     con.commit()
     con.close()
+
+def label_update_db(id, label):
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("UPDATE Samples SET label=%d WHERE id=%d" % (int(label),int(id)))
+    cur.execute(to_execute)
+    con.commit()
+    con.close()
