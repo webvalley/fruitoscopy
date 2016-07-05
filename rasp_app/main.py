@@ -9,6 +9,8 @@ from PIL import Image
 import datetime
 from signal_processing import *
 from database_interactions import *
+import base64
+import json
 
 UPLOAD_FOLDER = ''
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
@@ -104,7 +106,7 @@ def data_taken():
     """
 
     fruit = int(request.form['fruit'])
-    gps = "n/d"
+    gps = ""
     tmstp = time_now()
     processed = process_image()
     if(processed[0] == -1):
@@ -115,7 +117,7 @@ def data_taken():
     else:
         result = "NOT RIPE YET"
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    return "OK"
+    return ("OK," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
 
 @app.route('/take_data', defaults={'fruit': 1})
@@ -322,6 +324,21 @@ def update_label():
     label = request.form.get('label')
     label_update_db(id,label)
     return "OK"
+
+@app.route('/upload_img', methods=['GET', 'POST'])
+def upload_img():
+    img = request.json['imageData']
+    id = request.json['id_db']
+    id = id[1:]
+    g = open("out.png", "wb")
+    g.write(base64.b64decode(img))
+    g.close()
+    im = Image.open('out.png')
+    im.save('out.jpg')
+    insert_image(id)
+    msg = 'Image uploaded'
+    status = "success"
+    return json.dumps({"status" : status, "msg" : msg})
 
 if __name__ == "__main__":
     """

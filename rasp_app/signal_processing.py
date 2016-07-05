@@ -253,8 +253,8 @@ def process_image():
     #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
     save_plot(normalized, wl)
 
-    get_label(normalized)
-    
+    #get_label(normalized)
+
     return (0,normalized)
 
 def normalize(array, wl):
