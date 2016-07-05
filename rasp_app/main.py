@@ -60,8 +60,10 @@ def data_taken():
     TODO: return also machine learning prediction
     """
 
-    fruit = int(request.form['fruit'])
-    gps = ""
+    fruit = int(request.form.get('fruit'))
+    gps = request.form.get('gps')
+    if gps == None:
+        gps = ""
     tmstp = time_now()
     processed = process_image()
     if(processed[0] == -1):
@@ -287,8 +289,9 @@ def update_label():
 
 @app.route('/upload_img', methods=['GET', 'POST'])
 def upload_img():
-    img = request.json['imageData']
-    id = request.json['id_db']
+    received = request.get_json()
+    img = received['imageData']
+    id = received['id_db']
     #id = id[1:]
     g = open("out.png", "wb")
     g.write(base64.b64decode(img))

@@ -133,7 +133,7 @@ def save_plot(array, wl=[],controls=0):
     '''
 
     p = figure(plot_width=400, plot_height=400, responsive=True)
-    p.logo = None
+    p.toolbar.logo = None
     if not controls:
         p.toolbar_location = None
     # add a line renderer

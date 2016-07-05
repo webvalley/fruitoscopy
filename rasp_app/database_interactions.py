@@ -299,7 +299,7 @@ def get_last_id_inserted():
     con.commit()
     num = cur.fetchone()
     con.close()
-    return num
+    return num[0]
 
 def insert_image(id):
     name = "image_" + str(time_now()) + ".jpg"
