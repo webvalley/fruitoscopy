@@ -1,3 +1,4 @@
+from __future__ import division
 import os
 from flask import Flask, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
@@ -12,6 +13,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interactions import *
 from machine_learning import *
+from bokeh.plotting import figure
+from bokeh.embed import components
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -118,12 +121,20 @@ def save_plot(array, wl=[]):
     """
     if wl == []:
         wl = range(len(array))
-    plt.clf();plt.plot(wl,array,c='black')
+    #plt.clf();plt.plot(wl,array,c='black')
+    #savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
     #Uncomment to save csv arrays
     #f=open(HOME_PATH + '/static/spectrum.csv','a')
     #f.write(",".join(map(str, array))+'\n')
     #f.close()
-    savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
+    p = figure()
+    p.logo = None
+    p.toolbar_location = None
+    # add a line renderer
+    p.line(wl, array, line_width=2)
+
+    script, div = components(p)
+    return script, div
 
 def get_image():
     """
@@ -248,14 +259,11 @@ def process_image():
         if(normalized == -1):
             get_image()
             return -1, -1
-    plt.plot(background_rem)
-    #plt.plot(normalized)
-    #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
-    save_plot(normalized, wl)
+    script, div = save_plot(normalized, wl)
 
     #get_label(normalized)
 
-    return (0,normalized)
+    return (0,normalized, script, div)
 
 def normalize(array, wl):
     """

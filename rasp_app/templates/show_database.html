@@ -135,25 +135,28 @@
           var res = data.split(",");
 
           if(res[0]=="OK"){
-            var html = '<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">'
-            html += '<br><span class="details">Fruit: ' + res[1] + '</span>'
-            html += '<br><span class="details">Label: '
-            html += '<select class="form-control" id="fruit">'
-            html += '<option value="0"'
+            var html = '<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">';
+            html += '<br><span class="details">Fruit: ' + res[1] + '</span>';
+            html += '<br><span class="details">Label: ';
+            html += '<select class="form-control" id="fruit">';
+            html += '<option value="0"';
             if(res[2] == 0){
-              html += 'selected="selected"'
+              html += 'selected="selected"';
             }
-            html += '>0 - Bad</option>'
-            html += '<option value="1"'
+            html += '>0 - Bad</option>';
+            html += '<option value="1"';
             if(res[2] == 1){
-              html += 'selected="selected"'
+              html += 'selected="selected"';
             }
-            html += '>1 - Good</option>'
-            html += '</select></span>'
-            html += '<br><span class="details">GPS: ' + res[3] + '</span>'
-            html += '<br><span class="details">Timestamp: ' + res[4] + '</span>'
-            html += '<br><span class="details">ML_model: ' + res[5] + '</span>'
-            html += '<br><span class="details">SP_model: ' + res[6] + '</span>'
+            html += '>1 - Good</option>';
+            html += '</select></span>';
+            html += '<br><span class="details">GPS: ' + res[3] + '</span>';
+            html += '<br><span class="details">Timestamp: ' + res[4] + '</span>';
+            html += '<br><span class="details">ML_model: ' + res[5] + '</span>';
+            html += '<br><span class="details">SP_model: ' + res[6] + '</span>';
+            if(res[7] == 1){
+              html += '<br><img style="width:100%" src="/static/photo_associated.jpg?'+ new Date().getTime()+'"</span>';
+            }
             $('#modal_body').html(html);
           }
           else{

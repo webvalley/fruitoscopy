@@ -9,8 +9,11 @@ from PIL import Image
 import datetime
 from signal_processing import *
 from database_interactions import *
+from export_db import prepare_download_tar
 import base64
 import json
+from shutil import copyfile
+from utils import *
 
 UPLOAD_FOLDER = ''
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
@@ -18,54 +21,6 @@ HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def time_now():
-    """
-    This function receive as input nothing.
-    The return is the current timestamp.
-
-    The purpose of this function is to get the timestamp from the raspberry without asking to any device.
-    To do so a sync is needed.
-
-    The timestamp is calculated knowing the difference between the raspberry timestamp and the phone timestamp.
-    Fianal timestamp = raspberry_timestamp + difference_in_timestamp
-
-    Specifically:
-    @@@@@@@@@@@@@
-
-    :Return values:
-    ----------
-    - The current timestamp
-    """
-    in_file = open(HOME_PATH + "/timestamp.txt","r")
-    text = in_file.read()
-    from_file = int(text)
-    time_to_send = int(time.time()) + from_file
-    return time_to_send
-
-def update_time(timestamp):
-    """
-    This function receive as input the current timestamp of the device connected to the raspberry.
-    No return is given
-
-    The purpose of this function is to update the file with the difference of the tymestamp between the device and the raspberry
-    to get a precise metadata
-
-    Specifically:
-    @@@@@@@@@@@@@
-
-    :Values in input:
-    ----------
-    :value 0: The timestamp of the phone/PC
-
-    :Return values:
-    ----------
-    - nothing
-    """
-    out_file = open(HOME_PATH + "/timestamp.txt","w")
-    diff_time = int(float(timestamp))-int(time.time())
-    out_file.write(str(diff_time))
-    out_file.close()
 
 @app.route('/db_uploaded', methods=['GET', 'POST'])
 def upload_file():
@@ -117,7 +72,7 @@ def data_taken():
     else:
         result = "NOT RIPE YET"
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    return ("OK," + str(get_last_id_inserted()))
+    return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3])
     #return render_template('data_taken.html', field=field, result=result)
 
 @app.route('/take_data', defaults={'fruit': 1})
@@ -180,6 +135,7 @@ def download_db():
     """
     show the page to download the database from the raspberry into the device
     """
+    prepare_download_tar()
     return render_template('get_db.html')
 
 @app.route('/send_db')
@@ -256,8 +212,11 @@ def show_more_info():
     spectrum =  data[1].split(",")
     spectrum = [float(x) for x in spectrum]
     save_plot(spectrum, range(400,801))
-
-    return ("OK,%d,%d,%s,%d,%d,%d" % (data[2],data[3],data[4],data[5],data[6],data[7]))
+    photo = 0
+    if(data[8] != None):
+        copyfile(HOME_PATH + '/images/' +str(data[8]), HOME_PATH + '/static/photo_associated.jpg')
+        photo = 1
+    return ("OK,%d,%d,%s,%d,%d,%d,%d" % (data[2],data[3],data[4],data[5],data[6],data[7],photo))
     #return render_template('more_info_from_row.html', id_db=id_db)
 
 @app.route('/delete_data/<int:id_db>')

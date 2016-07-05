@@ -5,7 +5,7 @@ import datetime
 import sqlite3 as lite
 import numpy as np
 from shutil import copyfile
-from main import *
+from utils import time_now
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
