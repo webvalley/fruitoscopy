@@ -6,7 +6,6 @@ router = routers.DefaultRouter()
 router.register(r'samples', views.SampleViewSet)
 router.register(r'ml_models', views.ML_ModelViewSet)
 router.register(r'sp_models', views.SP_ModelViewSet)
-# router.register(r'samples_list', views.SampleViewSet)
 
 
 urlpatterns = [

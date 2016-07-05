@@ -54,6 +54,8 @@ REST_FRAMEWORK = {
 
 ROOT_URLCONF = 'frutopy.urls'
 
+TEMPLATE_DEBUG = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

@@ -1,12 +1,13 @@
 import sqlite3
 import psycopg2
 import os
+from frutopy.local_settings import BASE_IMG_DIR, DB_PARAMS_CONNECT
 from datetime import datetime
 
 
 def get_dir(dest):
     for root, dirs, files in os.walk(dest):
-        return os.path.join(dest, dirs[0])
+        return dirs[0], os.path.join(dest, dirs[0])
 
 def read_db(db_name, table_name='Samples'):
     conn = sqlite3.connect(db_name)
@@ -17,15 +18,19 @@ def read_db(db_name, table_name='Samples'):
     return my_table
 
 
-def write_central_db(rows):
-    conn = psycopg2.connect(database='frutopy', user='berry', password='password123', host='localhost')  # FIXME please
+def write_central_db(rows, folder_name):
+    conn = psycopg2.connect(DB_PARAMS_CONNECT)
     cur = conn.cursor()
     table_name = 'tables_sample'
+    img_abs_path = BASE_IMG_DIR + folder_name
     cur.execute("BEGIN;")
     for row in rows:
         a = "'{" + row[1] + "}'"
+        try:
+            img = os.path.join(img_abs_path, row[8])
+        except TypeError:
+            img = ""
         cur.execute(
-            """INSERT INTO %s (spectrum, fruit, label, gps, tmstp, ml_model_id, sp_model_id) VALUES (%s, %d, %d, '%s', '%s', %d, %d);"""
-            % (table_name, a, row[2], row[3], "djkdsfjkdsfj", datetime.fromtimestamp(row[5]), row[6]+1, row[7]+1))
-        conn.commit()
+            """INSERT INTO %s (spectrum, fruit, label, gps, tmstp, ml_model_id, sp_model_id, image_path) VALUES (%s, %d, %d, '%s', '%s', %d, %d, '%s');"""
+            % (table_name, a, row[2], row[3], row[4], datetime.fromtimestamp(row[5]), row[6]+1, row[7]+1, img))
     cur.execute("COMMIT;")

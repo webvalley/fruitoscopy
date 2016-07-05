@@ -1,8 +1,6 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.views.generic import View
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView
 from rest_framework import viewsets
 from tasks import process_file
 from .models import ML_Model, SP_Model, Sample
@@ -41,14 +39,14 @@ class SampleListView(View):
 
     def get(self, request):
         samples = Sample.objects.all()
-        
+
         return render(request, self.template_name, context={'samples': samples})
 
     def post(self, request):
         samples = Sample.objects.all()
         for s in samples:
             s.label = RIPENESS_LABELS[str(request.POST[str(s.pk)]).lower()]
-            # s.label_is_right?
+            # label_is_right doesn't make too much sense tbh
             s.save()
         return render(request, self.template_name, context={'samples': samples})
 
