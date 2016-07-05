@@ -13,8 +13,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interactions import *
 from machine_learning import *
-from bokeh.plotting import figure
-from bokeh.embed import components
+#from bokeh.plotting import figure
+#from bokeh.embed import components
 import matplotlib as mpl
 mpl.use('Agg')
 
