@@ -7,16 +7,16 @@ import sqlite3 as lite
 from signal_processing import *
 import scipy.signal as sps
 import scipy.optimize as opt
-from matplotlib.pylab import savefig
+#from matplotlib.pylab import savefig
 from PIL import Image
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from database_interactions import *
 from machine_learning import *
-#from bokeh.plotting import figure
-#from bokeh.embed import components
-import matplotlib as mpl
-mpl.use('Agg')
+from bokeh.plotting import figure
+from bokeh.embed import components
+#import matplotlib as mpl
+#mpl.use('Agg')
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -103,7 +103,7 @@ def remove_background(spectrum):
 
     return (background_rem)
 
-def save_plot(array, wl=[]):
+def save_plot(array, wl=[],controls=0):
     """
     This function receive as input an array.
     The return is nothing.
@@ -123,22 +123,25 @@ def save_plot(array, wl=[]):
     """
     if wl == []:
         wl = range(len(array))
-    plt.clf();plt.plot(wl,array,c='black')
-    savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
+    #plt.clf();plt.plot(wl,array,c='black')
+    #savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
     #Uncomment to save csv arrays
     #f=open(HOME_PATH + '/static/spectrum.csv','a')
-    #f.write(",".join(map(str, array))+'\n')
-    #f.close()
     '''
-    p = figure(plot_width=400, plot_height=400)
+    f.write(",".join(map(str, array))+'\n')
+    f.close()
+    '''
+
+    p = figure(plot_width=400, plot_height=400, responsive=True)
     p.logo = None
-    p.toolbar_location = None
+    if not controls:
+        p.toolbar_location = None
     # add a line renderer
     p.line(wl, array, line_width=2)
 
     script, div = components(p)
     return script, div
-    '''
+
 
 def get_image():
     """
@@ -263,12 +266,12 @@ def process_image():
         if(normalized == -1):
             get_image()
             return -1, -1
-    #script, div = save_plot(normalized, wl)
-    save_plot(normalized, wl)
+    script, div = save_plot(normalized, wl)
+    #save_plot(normalized, wl)
     #get_label(normalized)
 
-    #return (0,normalized, script, div)
-    return (0,normalized)
+    return (0,normalized, script, div)
+    #return (0,normalized)
 
 def normalize(array, wl):
     """

@@ -155,9 +155,9 @@
             if(res[0]=="OK"){
 
               html = '<center><h2>RESULT: not implemented yet</h2>'
-              //html += res[3];
-              //html += res[2];
-              html+='<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">'
+              html += res[3];
+              html += res[2];
+              //html+='<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">'
               //html += '<br><input type="file" id="file" name="file" class="file"/>'
               html += '</center><center><div id="button_open_modal"><button data-toggle="modal" data-target="#myModal" id="upload_photo" onclick="get_video()" class="btn btn-default">Add photo to spectrum</button></div></center>'
               html += '<input type=hidden id="id_db" value="' +res[1]+ '"/>'

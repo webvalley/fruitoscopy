@@ -72,8 +72,8 @@ def data_taken():
     else:
         result = "NOT RIPE YET"
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    #return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3])
-    return ("OK,," + str(get_last_id_inserted()))
+    return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3])
+    #return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
 
 @app.route('/take_data', defaults={'fruit': 1})
@@ -212,12 +212,12 @@ def show_more_info():
     data = get_data_by_id(id_db)
     spectrum =  data[1].split(",")
     spectrum = [float(x) for x in spectrum]
-    save_plot(spectrum, range(400,801))
+    script, div = save_plot(spectrum, range(400,801),controls=1)
     photo = 0
     if(data[8] != None):
         copyfile(HOME_PATH + '/images/' +str(data[8]), HOME_PATH + '/static/photo_associated.jpg')
         photo = 1
-    return ("OK,%d,%d,%s,%d,%d,%d,%d" % (data[2],data[3],data[4],data[5],data[6],data[7],photo))
+    return ("OK,,%d,,%d,,%s,,%d,,%d,,%d,,%d,,%s,,%s" % (data[2],data[3],data[4],data[5],data[6],data[7],photo,script,div))
     #return render_template('more_info_from_row.html', id_db=id_db)
 
 @app.route('/delete_data/<int:id_db>')
