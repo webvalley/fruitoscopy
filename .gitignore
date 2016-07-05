@@ -90,3 +90,7 @@ ENV/
 
 # PyCharm
 *.idea
+
+#Others
+*.jpg
+*.db
