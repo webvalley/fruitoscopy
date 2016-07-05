@@ -72,7 +72,8 @@ def data_taken():
     else:
         result = "NOT RIPE YET"
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3])
+    #return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3])
+    return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
 
 @app.route('/take_data', defaults={'fruit': 1})
@@ -288,7 +289,7 @@ def update_label():
 def upload_img():
     img = request.json['imageData']
     id = request.json['id_db']
-    id = id[1:]
+    #id = id[1:]
     g = open("out.png", "wb")
     g.write(base64.b64decode(img))
     g.close()

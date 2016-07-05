@@ -90,4 +90,7 @@ ENV/
 
 #Others
 *.jpg
+*.png
 *.db
+timestamp.txt
+*.tar
