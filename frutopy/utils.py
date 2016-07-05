@@ -23,7 +23,6 @@ def read_db(db_name, table_name='Samples'):
     return my_table
 
 
-# TODO: maybe add begin and commit?
 def write_central_db(rows):
     conn = psycopg2.connect(database='frutopy', user='berry', password='password123', host='localhost')  # FIXME please
     cur = conn.cursor()
