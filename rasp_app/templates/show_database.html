@@ -142,7 +142,7 @@
             html+= res[8];
             html += '<br><span class="details">Fruit: ' + res[1] + '</span>';
             html += '<br><span class="details">Label: ';
-            html += '<select class="form-control" id="fruit">';
+            html += '<select class="form-control" id="label_to_update">';
             html += '<option value="0"';
             if(res[2] == 0){
               html += 'selected="selected"';
@@ -153,7 +153,8 @@
               html += 'selected="selected"';
             }
             html += '>1 - Good</option>';
-            html += '</select></span>';
+            html += '</select></span>'
+            html += '<button onclick="update_label(' + id_db +')">Update label</button>';
             html += '<br><span class="details">GPS: ' + res[3] + '</span>';
             html += '<br><span class="details">Timestamp: ' + res[4] + '</span>';
             html += '<br><span class="details">ML_model: ' + res[5] + '</span>';

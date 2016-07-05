@@ -1,0 +1,28 @@
+To install the software on the Raspberry Pi you need to:
+
+    $ sudo apt-get install python-numpy python-scipy
+
+    $ sudo pip install flask scikit-learn
+
+
+Follow the guide on http://elinux.org/RPI-Wireless-Hotspot to configure the Raspberry Pi as Hotspot (point n° 4 is not mandatory, since the raspberry server is made to work offline)
+
+Clone the fruitoscopy repository (better in /home/pi/ )
+
+    git clone {{ insert here repository }}
+
+
+Add to the /etc/rc.local these lines before the " exit 0 "
+
+    sudo ifconfig wlan0 192.168.42.1
+    
+    sudo service udhcpd stop
+    
+    sudo service udhcpd start
+    
+    python /home/pi/fruitoscopy/rasp_app/main.py
+
+
+(You have to execute the main.py that you have cloned from the GitHub repository, if the path where you have cloned the repo is different, use yours)
+
+Francesco Ballerin - francesco@ballerin.it

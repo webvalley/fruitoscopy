@@ -165,7 +165,7 @@ def get_image(new_photo = 0):
     """
     param = get_params()
     if(new_photo):
-        os.system("raspistill -awb off -awbg 1.,1. -t 20000 -ex verylong -o " + HOME_PATH + "source.jpg")
+        os.system("raspistill -awb off -awbg 1.,1. -t 5000 -ex verylong -o " + HOME_PATH + "source.jpg")
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])

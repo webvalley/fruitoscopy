@@ -303,6 +303,15 @@ def upload_img():
     status = "success"
     return json.dumps({"status" : status, "msg" : msg})
 
+@app.route('/get_just_image', methods=['GET', 'POST'])
+def get_just_image():
+    get = request.form.get('get')
+    if(get == 'yes'):
+        get_image(new_photo=1)
+        return "OK"
+    else:
+        return "Error, post request was not made correctly"
+
 if __name__ == "__main__":
     """
     Just start the server open to everyone, on the port 5000
@@ -312,6 +321,8 @@ if __name__ == "__main__":
     if(not os.path.isfile(HOME_PATH + '/source.jpg')):
         print("Getting first source")
         get_image(new_photo=1)
+    if(not os.path.isfile(HOME_PATH + '/images')):
+        os.system("mkdir " + HOME_PATH + "/images")
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
         out_file = open(HOME_PATH + "/timestamp.txt","w")
         out_file.write(str(0))
