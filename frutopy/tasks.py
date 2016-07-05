@@ -1,8 +1,9 @@
 from celery import Celery
 import tempfile
 import tarfile
+import shutil
+from frutopy.local_settings import BASE_IMG_DIR
 from utils import *
-import os
 
 app = Celery('tasks', backend='amqp', broker='amqp://')
 
@@ -16,8 +17,11 @@ def process_file(file_path):
     with tempfile.TemporaryDirectory() as destination:
         print("created temporary directory %s" % destination)
         tfile.extractall(destination)
-        db_name = os.path.join(destination, "samples.db")
-        write_central_db(read_db(db_name))
+        print("Reading SQLITE database and wirting to PostgreSQL")
+        write_central_db(read_db("samples.db"))
+        print("Done you motherfucker")
+        print(get_dir(destination))
+        shutil.move(get_dir(destination), BASE_IMG_DIR)
     print("Unzipped at: %s" % destination)
 
 
