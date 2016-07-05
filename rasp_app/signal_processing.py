@@ -143,7 +143,7 @@ def save_plot(array, wl=[],controls=0):
     return script, div
 
 
-def get_image():
+def get_image(new_photo = 0):
     """
     This function receive as input some parameters as a tuple.
     The return value is the image of the spectrum.
@@ -164,6 +164,8 @@ def get_image():
     :value 0: Image of the spectrum
     """
     param = get_params()
+    if(new_photo):
+        os.system("raspistill -awb off -awbg 1.,1. -t 20000 -ex verylong -o " + HOME_PATH + "source.jpg")
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
@@ -246,7 +248,7 @@ def process_image():
 
     #param = (800,1000,2400,1250,5) #left,top,right,bottom, rotate
     param = get_params()
-    img_spectrum = get_image()
+    img_spectrum = get_image(new_photo=1)
 
     black_line = get_baseline(img_spectrum)
     #plt.plot(black_line, color="blue")

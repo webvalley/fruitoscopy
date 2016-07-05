@@ -309,6 +309,9 @@ if __name__ == "__main__":
     """
     if(not os.path.isfile(HOME_PATH + '/static/samples.db')):
         create_database_first_time()
+    if(not os.path.isfile(HOME_PATH + '/source.jpg')):
+        print("Getting first source")
+        get_image(new_photo=1)
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
         out_file = open(HOME_PATH + "/timestamp.txt","w")
         out_file.write(str(0))
