@@ -43,14 +43,16 @@ def data_taken():
     if(processed[0] == -1):
         return "CALIBRATION DONE"
     spectrum = processed[1].tolist()
-    l = random.randint(0,2)
-    if l:
+    if processed[0] == 1:
         result = "READY TO BE HARVESTED"
-    else:
+    elif processed[0] == 0:
         result = "NOT GOOD"
-    insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=l)
-    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
-        return "NO,,White calibration is needed"
+    else:
+        result = "TOO GOOD TO BE EATEN"
+
+    insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
+    #if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
+    #    return "NO,,White calibration is needed"
     return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3] + ",," + result)
     #return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
@@ -79,6 +81,8 @@ def take_data(fruit):
         get_white = 1
     else:
         get_white = 0
+
+    get_white=0
     return render_template('take_data.html', fruit=fruit, get_white=get_white)
 
 

@@ -94,3 +94,5 @@ ENV/
 *.db
 timestamp.txt
 *.tar
+*.npy
+*.pkl
