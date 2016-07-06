@@ -20,7 +20,7 @@ TEMPLATE_LOADERS = (
 
 TEMPLATE_DIRS = (
     # Include the "templates" directory in the current directory
-    os.path.join(os.path.dirname(__file__), "templates"),
+    os.path.join(os.path.dirname(__file__), "tables/templates"),
 )
 
 # Application definition

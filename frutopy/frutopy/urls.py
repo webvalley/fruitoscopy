@@ -10,8 +10,9 @@ router.register(r'sp_models', views.SP_ModelViewSet)
 
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')), # login URLs for browsable API
-    url(r'^$', 'tables.views.upload_file', name='upload_file'),
+    url(r'^upload/$', 'tables.views.upload_file', name='upload_file'),
     url(r'^success/$', 'tables.views.success', name='success'),
+    url(r'^$', 'tables.views.home', name='home'),
     url(r'^samples_list/$', views.SampleListView.as_view(), name='list'),
     url(r'^', include(router.urls))
 ]

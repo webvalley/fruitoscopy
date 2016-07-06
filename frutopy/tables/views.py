@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
+from django.contrib import messages
 from rest_framework import viewsets
 from tasks import process_file
 from .models import ML_Model, SP_Model, Sample
@@ -33,7 +34,7 @@ class SP_ModelViewSet(viewsets.ModelViewSet):
 
 class SampleListView(View):
     """
-    Allows user to check and modify labels.
+    Allows user to check and modify labels and validate the sample for further training.
     """
     template_name = 'samples_list.html'
 
@@ -44,10 +45,18 @@ class SampleListView(View):
 
     def post(self, request):
         samples = Sample.objects.all()
+        validated = request.POST.getlist('validation')
+        print(validated)
         for s in samples:
-            s.label = RIPENESS_LABELS[str(request.POST[str(s.pk)]).lower()]
-            # label_is_right doesn't make too much sense tbh
+            if s.label != RIPENESS_LABELS[str(request.POST[str(s.pk)]).lower()]:
+                s.label = RIPENESS_LABELS[str(request.POST[str(s.pk)]).lower()]
+                s.label_is_right = True
+            elif str(s.pk) in validated:
+                s.label_is_right = True
+            elif str(s.pk) not in validated and s.label_is_right == True:
+                s.label_is_right = False
             s.save()
+        messages.success(request, 'Database updated successfully!')
         return render(request, self.template_name, context={'samples': samples})
 
 def handle_uploaded_file(f):
@@ -80,3 +89,9 @@ def success(request):
     Redirects to Success page on successful file upload.
     """
     return render(request, 'success.html')
+
+def home(request):
+    """
+    Home page
+    """
+    return render(request, 'index.html')

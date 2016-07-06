@@ -1,3 +1,8 @@
+FRUIT_CHOICES = {
+    0: 'raspberry',
+    1: 'grape',
+}
+
 RIPENESS_CHOICES = (
     (0, 'not ripe'),
     (1, 'ripe'),

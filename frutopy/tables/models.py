@@ -12,6 +12,7 @@ class ML_Model(models.Model):
         return self.path
 
 
+
 #Signal Processing algorithms
 class SP_Model(models.Model):
 
@@ -35,3 +36,6 @@ class Sample(models.Model):
 
     def __string__(self):
         return self.spectrum
+
+    class Meta:
+        ordering = ['-tmstp']
