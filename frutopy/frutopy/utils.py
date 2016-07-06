@@ -1,7 +1,7 @@
 import sqlite3
 import psycopg2
 import os
-from frutopy.local_settings import BASE_IMG_DIR, DB_PARAMS_CONNECT
+from django.conf import settings
 from datetime import datetime
 
 
@@ -19,15 +19,15 @@ def read_db(db_name, table_name='Samples'):
 
 
 def write_central_db(rows, folder_name):
-    conn = psycopg2.connect(DB_PARAMS_CONNECT)
+    conn = psycopg2.connect(settings.DB_PARAMS_CONNECT)
     cur = conn.cursor()
     table_name = 'tables_sample'
-    img_abs_path = BASE_IMG_DIR + folder_name
     cur.execute("BEGIN;")
     for row in rows:
         a = "'{" + row[1] + "}'"
         try:
-            img = os.path.join(img_abs_path, row[8])
+            img = os.path.join(folder_name, row[8])
+            print(img)
         except TypeError:
             img = ""
         cur.execute(

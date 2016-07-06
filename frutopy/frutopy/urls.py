@@ -1,5 +1,7 @@
 from django.conf.urls import url, include
 from rest_framework import routers
+from django.conf.urls.static import static
+from django.conf import settings
 from tables import views
 
 router = routers.DefaultRouter()
@@ -14,5 +16,6 @@ urlpatterns = [
     url(r'^success/$', 'tables.views.success', name='success'),
     url(r'^$', 'tables.views.home', name='home'),
     url(r'^samples_list/$', views.SampleListView.as_view(), name='list'),
+    url(r'^download/$', views.DownloadModels.as_view(), name='list'),
     url(r'^', include(router.urls))
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

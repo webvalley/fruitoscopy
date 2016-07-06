@@ -8,6 +8,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Fruit</th>
                 <th>Label</th>
                 <th>Image</th>
@@ -18,10 +19,15 @@
         <tbody>
             {% for sample in samples %}
         <tr>
+            <td>{{sample.pk}}</td>
             <td>{{sample.fruit|getName}}</td>
             <td>{{sample.label|getLabel}}</td>
             <td>
-            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openModal({{sample.image_path}})">
+            {% if sample.image_path != ''%}
+                <button type="button" class="btn btn-primary btn-sm btn-block" onclick="openModal('{{sample.image_path}}')">
+                    Open
+                </button>
+            {% endif %}
             </td>
             <td>
                 <select name="{{sample.pk}}">
@@ -48,7 +54,7 @@
                 <h4 class="modal-title">Image</h4>
               </div>
               <div class="modal-body">
-                <img id="modal-image"></img>
+                <img id="modal-image">
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -58,8 +64,9 @@
         </div><!-- /.modal -->
         <script type="text/javascript">
             function openModal (imagePath) {
-                $("#modal-container").modal('show');
-                $("#modal-image").attr("src", imagePath);
+                console.log(imagePath)
+                $('#modal-container').modal('show');
+                $('#modal-image').attr('src', imagePath);
             }
         </script>
 {% endblock content %}

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.contrib import messages
 from rest_framework import viewsets
-from tasks import process_file
+from .tasks import process_file
 from .models import ML_Model, SP_Model, Sample
 from tables.choices import RIPENESS_LABELS
 from .serializers import *
@@ -40,7 +40,12 @@ class SampleListView(View):
 
     def get(self, request):
         samples = Sample.objects.all()
-
+# import tempfile
+# import tarfile
+# import os
+# import shutil
+# from django.conf import settings
+# from utils import write_central_db, read_db, get_dir
         return render(request, self.template_name, context={'samples': samples})
 
     def post(self, request):
@@ -58,6 +63,23 @@ class SampleListView(View):
             s.save()
         messages.success(request, 'Success! The database has been updated successfully.')
         return render(request, self.template_name, context={'samples': samples})
+
+class DownloadModels(View):
+    """
+
+    """
+    template_name = "download_models.html"
+
+    def get(self, request):
+        samples = Sample.objects.all()
+
+        return render(request, self.template_name, context={'samples': samples})
+
+    def post(self, request):
+
+        return render(request, self.template_name, context={'samples': samples})
+
+
 
 def handle_uploaded_file(f):
     """

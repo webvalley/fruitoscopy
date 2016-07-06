@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+SECRET_KEY = 'oztx+%k61#m99ur!h#42+uu$y41mlzux@uj%tfsod0z$72v7_)'
 
 
 TEMPLATE_LOADERS = (
@@ -36,6 +39,10 @@ INSTALLED_APPS = [
     'tables',
 ]
 
+STATICFILES_FINDERS = ("django.contrib.staticfiles.finders.FileSystemFinder",
+"django.contrib.staticfiles.finders.AppDirectoriesFinder")
+
+
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,7 +61,6 @@ REST_FRAMEWORK = {
 
 ROOT_URLCONF = 'frutopy.urls'
 
-TEMPLATE_DEBUG = True
 
 TEMPLATES = [
     {
@@ -92,4 +98,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+try:
+    from .local_settings import *
+except ImportError as e:
+    pass
 
