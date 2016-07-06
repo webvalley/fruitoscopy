@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+    <div class="container-fluid buttons">
+        <div class="row">
+
+            <div class="col-md-4">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                   aria-expanded="false">
+                    <button type="button" class="btn btn-primary btn-lg btn-block"> About <span
+                            class="caret"></span></button>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="link_1"> The project </a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="link_2"> FBK </a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <a href="my_link">
+                    <button type="button" class="btn btn-primary btn-lg btn-block">Something</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block content %}
+<div class="push container">
+    <!-- example content -->
+    <div class="row">
+        <div class="col-md-4">.col-md-4</div>
+        <div class="col-md-4">.col-md-4</div>
+        <div class="col-md-4">.col-md-4</div>
+    </div>
+</div>
+{% endblock content %}
+
+    <footer class="footer">
+        <div class="container">
+            <br>
+            <div class="row">
+                <div class="col-md-4">
+                    <b>Web Valley 2016</b>
+                </div>
+                <div class="col-md-4">
+                    <b>FBK Foundation</b>
+                </div>
+                <div class="col-md-4">
+                    <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu</b></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

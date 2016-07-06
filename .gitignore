@@ -89,8 +89,12 @@ ENV/
 .ropeproject
 
 # PyCharm
+*.samples.db
+*.samples.db.tar.gz
 *.idea
+<<<<<<< HEAD
 
 #Others
 *.jpg
 *.db
+*.sqlite3
