@@ -14,42 +14,16 @@ import base64
 import json
 from shutil import copyfile
 from utils import *
+from apply_config import *
+import random
 
-UPLOAD_FOLDER = ''
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = HOME_PATH + '/temp_data'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/db_uploaded', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return 'No file part'
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        try:
-            if len(file.filename)<2:
-                try:
-                    flash('No selected file')
-                    return "No selected file"
-                except:
-                    return "Unable to flash"
-        except:
-            return "Unable to work with empty file"
-
-        try:
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(HOME_PATH + "/databases", filename))
-                return 'Everything worked, but your file will be deleted because the system is not ready yet'
-        except:
-            return "unable to work with full file"
-    return "Not a POST request"
 
 @app.route('/data_taken', methods=['GET', 'POST'])
 def data_taken():
@@ -69,12 +43,13 @@ def data_taken():
     if(processed[0] == -1):
         return "CALIBRATION DONE"
     spectrum = processed[1].tolist()
-    if processed[0]:
-        result = "IS RIPE"
+    l = random.randint(0,2)
+    if l:
+        result = "READY TO BE HARVESTED"
     else:
-        result = "NOT RIPE YET"
+        result = "NOT GOOD"
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3])
+    return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3] + ",," + result)
     #return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
 
@@ -141,12 +116,41 @@ def download_db():
     prepare_download_tar()
     return render_template('get_db.html')
 
-@app.route('/send_db')
-def upload_db():
+@app.route('/send_file')
+def upload_conf_file():
+    """
+    Show the page to send a new configuration file
+    """
+    return render_template('send_file.html')
+
+@app.route('/send_file_done', methods=['GET', 'POST'])
+def upload_conf_file_done():
     """
     Show the page to send the database to the server (the django one that will be deployed)
     """
-    return render_template('send_db.html')
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return 'No file part'
+        file = request.files.get('file')
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file == None:
+            return "No selected file"
+
+
+        if file and ("config" in file.filename and ".tar" in file.filename):
+            #filename = secure_filename(file.filename)
+            filename = file.filename
+            file.save(os.path.join(HOME_PATH + "/temp_data", filename))
+            result = apply_configuration(filename = filename)
+            if result == 1:
+                return "OK"
+            else:
+                return "Error"
+    return "Error"
+    return render_template('send_file.html')
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -321,10 +325,14 @@ if __name__ == "__main__":
     if(not os.path.isfile(HOME_PATH + '/source.jpg')):
         print("Getting first source")
         get_image(new_photo=1)
-    if(not os.path.isfile(HOME_PATH + '/images')):
-        os.system("mkdir " + HOME_PATH + "/images")
+    if(not os.path.isdir(HOME_PATH + '/images')):
+        os.system("mkdir " + HOME_PATH + '/images')
+    if(not os.path.isdir(HOME_PATH + '/configuration')):
+        os.system("mkdir " + HOME_PATH + '/configuration')
+    if(not os.path.isdir(HOME_PATH + '/temp_data')):
+        os.system("mkdir " + HOME_PATH + '/temp_data')
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
-        out_file = open(HOME_PATH + "/timestamp.txt","w")
+        out_file = open(HOME_PATH + '/timestamp.txt',"w")
         out_file.write(str(0))
         out_file.close()
     app.run(host='0.0.0.0')
