@@ -25,3 +25,8 @@ def apply_configuration(filename):
         return 0
     tarconfig.close()
     return 1
+
+def save_white(array):
+    f = open(HOME_PATH + '/white_cal.txt', 'w')
+    f.write(" ".join(map(str, array)))
+    f.close()

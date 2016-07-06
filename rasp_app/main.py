@@ -49,6 +49,8 @@ def data_taken():
     else:
         result = "NOT GOOD"
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=l)
+    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
+        return "NO,,White calibration is needed"
     return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3] + ",," + result)
     #return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
@@ -73,7 +75,11 @@ def take_data(fruit):
     ----------
     - The confirmation HTML page
     """
-    return render_template('take_data.html', fruit=fruit)
+    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
+        get_white = 1
+    else:
+        get_white = 0
+    return render_template('take_data.html', fruit=fruit, get_white=get_white)
 
 
 @app.route('/sync_timestamp', methods=['GET', 'POST'])
@@ -316,6 +322,16 @@ def get_just_image():
     else:
         return "Error, post request was not made correctly"
 
+@app.route('/calibrate_white')
+def calibrate_white():
+    return render_template('calib_white.html')
+
+@app.route('/calibrate_white_done', methods=['GET', 'POST'])
+def calibrate_white_done():
+    processed = process_image(white_spectrum=1)
+    save_white(processed[1])
+    return "OK"
+
 if __name__ == "__main__":
     """
     Just start the server open to everyone, on the port 5000
@@ -331,6 +347,8 @@ if __name__ == "__main__":
         os.system("mkdir " + HOME_PATH + '/configuration')
     if(not os.path.isdir(HOME_PATH + '/temp_data')):
         os.system("mkdir " + HOME_PATH + '/temp_data')
+    if(os.path.isfile(HOME_PATH + '/white_cal.txt')):
+        os.system("rm " + HOME_PATH + '/white_cal.txt')
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
         out_file = open(HOME_PATH + '/timestamp.txt',"w")
         out_file.write(str(0))

@@ -9,3 +9,7 @@ HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
 def configure_wl():
     pass
+
+def get_white_spectrum():
+    white_spectrum = np.genfromtxt(HOME_PATH + '/white_cal.txt', delimiter=' ')
+    return white_spectrum

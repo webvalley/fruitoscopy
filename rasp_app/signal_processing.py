@@ -17,6 +17,7 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 #import matplotlib as mpl
 #mpl.use('Agg')
+from calibration import get_white_spectrum
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -223,7 +224,7 @@ def get_baseline(img_spectrum):
         black_line.append(max(elem))
     return black_line
 
-def process_image():
+def process_image(white_spectrum = 0):
     """
     I will process the image, taking 1 tuple made of parameters as input.
     The return values will be the label of the sample and the spectrum
@@ -268,6 +269,9 @@ def process_image():
         if(normalized == -1):
             get_image()
             return -1, -1
+
+    if not white_spectrum:
+        normalized = get_white_spectrum() / normalized
     script, div = save_plot(normalized, wl)
     #save_plot(normalized, wl)
     #get_label(normalized)

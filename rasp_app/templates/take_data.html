@@ -17,7 +17,7 @@
     <script src="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.js') }}"></script>
   </head>
 
-  <body onload="get_geo()">
+  <body onload="start_function({{ get_white }});get_geo()">
 
   <style type="text/css">
     .navbar-title {color: #337ab7;
@@ -140,6 +140,12 @@
     <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
+    function start_function(val){
+      if(val){
+        alert("White calibration is not already done!");
+        window.location.href = "/calibrate_white"
+      }
+    }
     var got_position, latitude, longitude;
     got_position = 0;
     function success(position) {
@@ -197,6 +203,10 @@
             else if(data=="CALIBRATION DONE"){
               alert("Calibration was wrong. Auto configuration tried to minimize the error. A new wavelenght calibration is needed!!!");
               window.location.href = "/calib_spectrum"
+            }
+            else if(res[0] == "NO"){
+              alert(res[1]);
+              window.location.href = "/"
             }
             else{
               alert("ERROR");
