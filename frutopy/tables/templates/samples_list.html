@@ -21,8 +21,7 @@
             <td>{{sample.fruit|getName}}</td>
             <td>{{sample.label|getLabel}}</td>
             <td>
-            <button type="button" data-toggle="modal" data-target="#myModal" onclick="showpic({{sample.pk}})">PIC</button></a>
-
+            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openModal({{sample.image_path}})">
             </td>
             <td>
                 <select name="{{sample.pk}}">
@@ -41,27 +40,26 @@
         <input type="submit" value="Save">
         </table>
         </form>
-        <div id="myModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Image</h4>
-                    </div>
-                <div class="modal-body">
-                    <p>
-                        some text here
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-                </div>
-            </div>
-        </div>
-    <script>
-
-    </script>
+        <div class="modal fade" id="modal-container" tabindex="-1" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Image</h4>
+              </div>
+              <div class="modal-body">
+                <img id="modal-image"></img>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <script type="text/javascript">
+            function openModal (imagePath) {
+                $("#modal-container").modal('show');
+                $("#modal-image").attr("src", imagePath);
+            }
+        </script>
 {% endblock content %}

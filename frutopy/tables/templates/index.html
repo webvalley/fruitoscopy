@@ -1,75 +1,31 @@
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fruitoscopy</title>
-    <link href="{% static 'main.css %}" type="text/css" rel="stylesheet"/>
-    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" type="text/css" rel="stylesheet"
-          media="screen,projection"/>
-    <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" type="text/css"
-          rel="stylesheet" media="screen,projection"/>
-    <link href="{% static 'bootstrap/css/bootstrap.css' %}" type="text/css" rel="stylesheet"
-          media="screen,projection"/>
-    <link href="{% static 'bootstrap/css/bootstrap-theme.css' %}" type="text/css" rel="stylesheet"
-          media="screen,projection"/>
-</head>
-
-<body>
-<div class="body">
-    <nav class="navbar navbar-default">
-        <br>
-        <div class="container-fluid fix row">
-            <div class="navbar-header col-md-1">
-                <a class="navbar-brand" href="/">
-                    <img alt="FBK" src="{% static 'logoFBK-2.jpg') %}">
-                </a>
-            </div>
-            <div class="col-md-4 fix2">
-                <centre>
-                    <h1 class="navbar-title">Spectroscope index</h1>
-                </centre>
-            </div>
-        </div>
-        <br>
-    </nav>
+{% extends 'base.html' %}
 
     <div class="container-fluid buttons">
         <div class="row">
-            <!-- You can use the same grid system for this buttons. The grid system is not used for the 'small' screens,
-            like on mobile, where all the buttons are stacked -->
 
-            <!-- single link button -->
             <div class="col-md-4">
-                <a href="my_link">
-                    <button type="button" class="btn btn-primary btn-lg btn-block">4-Units-Large Single Button</button>
-                </a>
-            </div>
-
-            <!-- dropdown button -->
-            <div class="col-md-8">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                    aria-expanded="false">
-                    <button type="button" class="btn btn-primary btn-lg btn-block">8-Units-Large Dropdown <span
+                    <button type="button" class="btn btn-primary btn-lg btn-block"> About <span
                             class="caret"></span></button>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="link_1">Link #1</a></li>
+                    <li><a href="link_1"> The project </a></li>
                     <li role="separator" class="divider"></li>
-
-                    <li><a href="{% static 'staticfile' %}">Download A Static File</a></li>
-                    <li role="separator" class="divider"></li>
-
-                    <li><a href="link_2">Link #2</a></li>
+                    <li><a href="link_2"> FBK </a></li>
                 </ul>
+            </div>
+
+            <div class="col-md-4">
+                <a href="my_link">
+                    <button type="button" class="btn btn-primary btn-lg btn-block">Something</button>
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Content div -->
+{% block content %}
 <div class="push container">
     <!-- example content -->
     <div class="row">
@@ -78,25 +34,23 @@
         <div class="col-md-4">.col-md-4</div>
     </div>
 </div>
+{% endblock content %}
 
-<footer class="footer">
-    <div class="container">
-        <br>
-        <div class="row">
-            <div class="col-md-4">
-                <b>Web Valley 2016</b>
-            </div>
-            <div class="col-md-4">
-                <b>FBK Foundation</b>
-            </div>
-            <div class="col-md-4">
-                <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu</b></a>
+    <footer class="footer">
+        <div class="container">
+            <br>
+            <div class="row">
+                <div class="col-md-4">
+                    <b>Web Valley 2016</b>
+                </div>
+                <div class="col-md-4">
+                    <b>FBK Foundation</b>
+                </div>
+                <div class="col-md-4">
+                    <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu</b></a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
-
-<script src="{% static 'jquery.min.js' %}"></script>
-<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    </footer>
 </body>
 </html>

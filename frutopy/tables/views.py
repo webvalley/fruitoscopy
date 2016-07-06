@@ -56,7 +56,7 @@ class SampleListView(View):
             elif str(s.pk) not in validated and s.label_is_right == True:
                 s.label_is_right = False
             s.save()
-        messages.success(request, 'Database updated successfully!')
+        messages.success(request, 'Success! The database has been updated successfully.')
         return render(request, self.template_name, context={'samples': samples})
 
 def handle_uploaded_file(f):
@@ -92,6 +92,6 @@ def success(request):
 
 def home(request):
     """
-    Home page
+    Home page.
     """
     return render(request, 'index.html')
