@@ -8,25 +8,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>
-        {% block title %}
+    {% block title %}
+    <title>Fruitipy</title>
+    {% endblock title %}
 
-        {% endblock title %}
-    </title>
-
-    <link href="{% static 'css/main.css' %}" type="text/css" rel="stylesheet"/>
-    <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet"
+    <link href="{% static 'bootstrap/css/main.css' %}" type="text/css" rel="stylesheet"/>
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" type="text/css" rel="stylesheet"
           media="screen,projection"/>
-    <link href="{% static 'css/bootstrap-theme.min.css' %}" type="text/css"
-          rel="stylesheet" media="screen,projection"/>
-    <link href="{% static 'css/bootstrap.css' %}" type="text/css" rel="stylesheet"
+    <link href="{% static 'bootstrap/css/bootstrap-theme.css' %}" type="text/css" rel="stylesheet"
           media="screen,projection"/>
-    <link href="{% static 'css/bootstrap-theme.css' %}" type="text/css" rel="stylesheet"
-          media="screen,projection"/>
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet"
-          media="screen,projection"/>
+    <script src="{% static 'jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -34,7 +26,7 @@
     <div class="container-fluid fix row">
         <div class="navbar-header col-md-1">
             <a class="navbar-brand" href="/">
-                <img alt="FBK" src="{% static 'logoFBK-2.jpg' %}">
+                <img alt="FBK" src="{% static 'images/logoFBK-2.jpg' %}">
             </a>
         </div>
         <div class="col-md-4 fix2">
@@ -43,6 +35,8 @@
     </div>
     <br>
 </nav>
+
+
 
 <div class="container">
     {% if messages %}
@@ -63,9 +57,10 @@
     {% endif %}
     <!-- Beginning of the page area -->
     <div class="row">
+        <div class="col-md-12">
         {% block content %}
-
-        {% endblock content %}
+            {% endblock content %}
+        </div>
     </div>
     <!-- End of the page area -->
 </div>

@@ -4,10 +4,9 @@ from django.views.generic import View
 from django.contrib import messages
 from rest_framework import viewsets
 from .tasks import process_file
-from .models import ML_Model, SP_Model, Sample
+from .models import ML_Model, SP_Model, Sample, Image
 from tables.choices import RIPENESS_LABELS
-from .serializers import *
-import tarfile
+from . import serializers
 import time
 import os
 from io import BytesIO
@@ -17,7 +16,7 @@ class SampleViewSet(viewsets.ModelViewSet):
     Allows samples to be viewed or edited.
     """
     queryset = Sample.objects.all().order_by('-id') # Descending order
-    serializer_class = SampleSerializer
+    serializer_class = serializers.SampleSerializer
 
 
 class ML_ModelViewSet(viewsets.ModelViewSet):
@@ -25,7 +24,7 @@ class ML_ModelViewSet(viewsets.ModelViewSet):
     Allows machine learning models to be viewed or edited.
     """
     queryset = ML_Model.objects.all().order_by('-id')
-    serializer_class = ML_ModelSerializer
+    serializer_class = serializers.ML_ModelSerializer
 
 
 class SP_ModelViewSet(viewsets.ModelViewSet):
@@ -33,7 +32,8 @@ class SP_ModelViewSet(viewsets.ModelViewSet):
     Allows signal processing models to be viewed, edited, or deleted.
     """
     queryset = SP_Model.objects.all().order_by('-id')
-    serializer_class = SP_ModelSerializer
+    serializer_class = serializers.SP_ModelSerializer
+
 
 class SampleListView(View):
     """
@@ -62,22 +62,32 @@ class SampleListView(View):
         messages.success(request, 'Success! The database has been updated successfully.')
         return render(request, self.template_name, context={'samples': samples})
 
-class DownloadModels(View):
-    """
 
+class ImageListView(View):
     """
-    template_name = "download_models.html"
+    Allows user to check and modify labels and validate the sample for further training.
+    """
+    template_name = 'images_list.html'
 
     def get(self, request):
-        samples = Sample.objects.all()
+        image = Image.objects.all()
 
-        return render(request, self.template_name, context={'samples': samples})
+        return render(request, self.template_name, context={'image': image})
 
     def post(self, request):
-
-        return render(request, self.template_name, context={'samples': samples})
-
-
+        image = Image.objects.all()
+        validated = request.POST.getlist('validation')
+        for i in image:
+            if i.label != RIPENESS_LABELS[str(request.POST[str(i.pk)]).lower()]:
+                i.label = RIPENESS_LABELS[str(request.POST[str(i.pk)]).lower()]
+                i.label_is_right = True
+            elif str(i.pk) in validated:
+                i.label_is_right = True
+            elif str(i.pk) not in validated and i.label_is_right == True:
+                i.label_is_right = False
+            i.save()
+        messages.success(request, 'Success! The database has been updated successfully.')
+        return render(request, self.template_name, context={'images': images})
 
 def handle_uploaded_file(f):
     """
@@ -119,6 +129,7 @@ def upload_file(request):
         return HttpResponseRedirect('/success')
     #print('not valid you idiot')
     return render(request, 'upload.html')
+
 
 def about(request):
     return render(request, 'about.html')

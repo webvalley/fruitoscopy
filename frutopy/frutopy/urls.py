@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^about/$', 'tables.views.about', name='about'),
     url(r'^success/$', 'tables.views.success', name='success'),
     url(r'^$', 'tables.views.home', name='home'),
-    url(r'^samples_list/$', views.SampleListView.as_view(), name='list'),
-    url(r'^download/$', views.DownloadModels.as_view(), name='list'),
+    url(r'^samples_list/$', views.SampleListView.as_view(), name='samples_list'),
+    url(r'^images_list/$', views.ImageListView.as_view(), name='samples_list'),
     url(r'^', include(router.urls))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
