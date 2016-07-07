@@ -14,9 +14,10 @@ def process_file(file_path):
     Untar file and process SQLite database to update main PostgreSQL database
     """
     print("File path: %s" % file_path)
-    tfile = tarfile.open(file_path, 'r:gz')
+    tfile = tarfile.open(file_path)
     with tempfile.TemporaryDirectory() as destination:
         tfile.extractall(destination)
+        print(os.listdir(destination))
         a = get_dir(destination)
         shutil.move(a[1], settings.MEDIA_ROOT)
         write_central_db(read_db(os.path.join(destination, settings.INPUT_DB)), os.path.join(settings.MEDIA_URL, a[0]))

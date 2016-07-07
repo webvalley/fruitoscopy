@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import ArrayField
 from tables.choices import RIPENESS_CHOICES
 from frutopy.local_settings import BASE_IMG_DIR
 
+
 # Machine Learning models
 class ML_Model(models.Model):
 
@@ -12,14 +13,14 @@ class ML_Model(models.Model):
         return self.path
 
 
-
-#Signal Processing algorithms
+# Signal Processing algorithms
 class SP_Model(models.Model):
 
     vals = models.TextField()
 
     def __string__(self):
         return self.path
+
 
 # Samples
 class Sample(models.Model):
@@ -39,3 +40,10 @@ class Sample(models.Model):
 
     class Meta:
         ordering = ['-tmstp']
+
+
+# Images
+class Image(models.Model):
+    path = models.FilePathField(BASE_IMG_DIR)
+    label = models.SmallIntegerField(choices=RIPENESS_CHOICES)
+    label_is_right = models.NullBooleanField(default=False)
