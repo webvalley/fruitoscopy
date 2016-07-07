@@ -23,6 +23,8 @@
           media="screen,projection"/>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet"
+          media="screen,projection"/>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -34,11 +36,25 @@
             </a>
         </div>
         <div class="col-md-4 fix2">
-            <h1 class="navbar-title">Fruitoscopy</h1>
+            <h1 class="navbar-title">Fruitipy</h1>
         </div>
     </div>
     <br>
 </nav>
+
+<div class="container-fluid buttons">
+        <br>
+          <div class="row" id="menu_row">
+          <div id="adjust_bar">
+          <div class="col-md-6">
+            <a href="upload/"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Upload to database</b></button></a>
+          </div>
+          <div class="col-md-6">
+            <a href="about/"><button type="button" class="btn btn-primary btn-lg btn-block"><b>About</b></button></a>
+          </div>
+            </div>
+        <br>
+      </div>
 
 
 
