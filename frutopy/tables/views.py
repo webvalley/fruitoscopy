@@ -7,8 +7,10 @@ from .tasks import process_file
 from .models import ML_Model, SP_Model, Sample
 from tables.choices import RIPENESS_LABELS
 from .serializers import *
-import tempfile
+import tarfile
+import time
 import os
+from io import BytesIO
 
 class SampleViewSet(viewsets.ModelViewSet):
     """
@@ -90,12 +92,20 @@ def handle_uploaded_file(f):
     #     # tfile = tarfile.open(name, 'r:gz')
     #     process_file.delay(name)
 
-    fd, file_name = tempfile.mkstemp()
 
-    for chunk in f.chunks():
-        os.write(fd, chunk)
-    os.close(fd)
-    process_file.delay(file_name)
+    path = '/home/l-brognoli/'
+    a = str(int(time.time()))
+    os.makedirs(os.path.join(path, a))
+    full_path = os.path.join(path, a)
+    with tarfile.TarFile(full_path + '/tmp_file.gz', 'w') as fd:
+        string = BytesIO()
+        for chunk in f.chunks():
+            string.write(chunk)
+        string.seek(0)
+        info = tarfile.TarInfo(name="berry")
+        #info.size = len(string)
+        fd.addfile(tarinfo=info, fileobj=string)
+    process_file.delay(os.path.join(full_path, 'tmp_file.gz'))
 
 def upload_file(request):
     """
