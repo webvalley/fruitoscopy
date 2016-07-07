@@ -259,6 +259,9 @@ def reset_samples():
     to_execute = ("DELETE FROM Samples")
     cur.execute(to_execute)
     con.commit()
+    to_execute = ("UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='Samples'")
+    cur.execute(to_execute)
+    con.commit()
     con.close()
 
 def reset_all_database():

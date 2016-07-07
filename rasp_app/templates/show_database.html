@@ -51,7 +51,7 @@
       <nav class="navbar navbar-default">
         <br>
         <div class="container-fluid fix row">
-          <div class="navbar-header col-md-1">
+          <div>
             <a class="navbar-brand" href="/">
               <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
             </a>
@@ -71,32 +71,30 @@
       <span>   To: <span><input type="date" name="to_date" id="to_date" value="{{date_to}}">
       <button id="search_date">Search</button>
     </center>
-
+    <table class="table table-striped table-bordered" style="width:100%;">
+      <br><br>
     {% for row in rows %}
-      <table class="table table-bordered" style="width:100vw;">
-        <br><br>
+
         <tr>
-          <td class="active">
+          <td>
               <p><b>ID:</b> {{row[0]}}</p>
           </td>
           <td>
               <p><b>Fruit:</b> {{row[2]}}</p>
           </td>
-          <td class="active">
+          <td>
               <p><b>Label:</b> {{row[3]}}</p>
           </td>
           <td>
               <p><b>Time:</b> {{row[5]}}</p>
           </td>
-          <td class="active">
-              <p><b>GPS:</b> {{row[4]}}</p>
-          </td>
           <td>
               <a href="#"><button data-toggle="modal" data-target="#myModal" onclick="more_info({{row[0]}})"><b>MORE INFO</b> for ID {{row[0]}}</button></a>
           </td>
         </tr>
-      </table>
+
     {% endfor %}
+    </table>
     <!-- Modal -->
     <div class="modal fade" id="myModal" role="dialog">
       <div class="modal-dialog">
@@ -147,13 +145,13 @@
             if(res[2] == 0){
               html += 'selected="selected"';
             }
-            html += '>0 - Bad</option>';
+            html += '>0 - Not ready Yet</option>';
             html += '<option value="1"';
             if(res[2] == 1){
               html += 'selected="selected"';
             }
-            html += '>1 - Good</option>';
-            html += '</select></span>'
+            html += '>1 - Ready to be harvested</option>';
+            html += '<option value=2>2 - Too ripe</option></select></span>'
             html += '<button onclick="update_label(' + id_db +')">Update label</button>';
             html += '<br><span class="details">GPS: ' + res[3] + '</span>';
             html += '<br><span class="details">Timestamp: ' + res[4] + '</span>';

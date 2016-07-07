@@ -270,8 +270,9 @@ def process_image(white_spectrum = 0):
             get_image()
             return -1, -1
 
-    if not white_spectrum:
-        normalized = get_white_spectrum() / normalized
+    #if not white_spectrum:
+    #    normalized = get_white_spectrum() / normalized
+
     script, div = save_plot(normalized, wl)
     #save_plot(normalized, wl)
     label = get_label(normalized)
@@ -312,8 +313,8 @@ def normalize(array, wl):
     param = get_spectrum_param()
     diff_param = param[1] - param[0]
 
-    begin = param[0] - diff_param * 0.375
-    end = param[1] + diff_param * 0.625
+    begin = param[0] - diff_param * 0.75
+    end = param[1] + diff_param * 2.25
 
     begin_px = int(begin*len(array)/1000)
     end_px = int(end*len(array)/1000)

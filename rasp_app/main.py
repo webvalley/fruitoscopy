@@ -17,7 +17,6 @@ from utils import *
 from apply_config import *
 import random
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = HOME_PATH + '/temp_data'
 
@@ -33,6 +32,9 @@ def data_taken():
 
     TODO: return also machine learning prediction
     """
+
+    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
+        return "NO,,White calibration is needed"
 
     fruit = int(request.form.get('fruit'))
     gps = request.form.get('gps')
@@ -50,9 +52,8 @@ def data_taken():
     else:
         result = "TOO GOOD TO BE EATEN"
 
+
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    #if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
-    #    return "NO,,White calibration is needed"
     return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3] + ",," + result)
     #return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
@@ -156,11 +157,10 @@ def upload_conf_file_done():
             file.save(os.path.join(HOME_PATH + "/temp_data", filename))
             result = apply_configuration(filename = filename)
             if result == 1:
-                return "OK"
+                return render_template('send_file_done.html')
             else:
                 return "Error"
     return "Error"
-    return render_template('send_file.html')
 
 @app.errorhandler(404)
 def page_not_found(error):
