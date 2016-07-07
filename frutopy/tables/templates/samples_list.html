@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load tablestags %}
+
+{% block content %}
+<div class="col-md-12">
+    <h2>Samples List</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fruit</th>
+                <th>Label</th>
+                <th>Image</th>
+                <th>Check Label</th>
+                <th>Validate</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sample in samples %}
+        <tr>
+            <td>{{sample.pk}}</td>
+            <td>{{sample.fruit|getName}}</td>
+            <td>{{sample.label|getLabel}}</td>
+            <td>
+            {% if sample.image_path != ''%}
+                <button type="button" class="btn btn-primary btn-sm btn-block" onclick="openModal('{{sample.image_path}}')">
+                    Open
+                </button>
+            {% endif %}
+            </td>
+            <td>
+                <select name="{{sample.pk}}">
+                    <option name="0" {% ifequal sample.label 0 %} selected {% endifequal %}>Not Ripe</option>
+                    <option name="1" {% ifequal sample.label 1 %} selected {% endifequal %}>Ripe</option>
+                    <option name="2" {% ifequal sample.label 2 %} selected {% endifequal %}>Too Ripe</option>
+                </select>
+            </td>
+            <td>
+                <input type="checkbox" name="validation" value="{{sample.pk}}" {% if sample.label_is_right %} checked {% endif %}>
+            </td>
+        </tr>
+
+        {% endfor %}
+        </tbody>
+        <input type="submit" value="Save">
+        </table>
+        </form>
+        <div class="modal fade" id="modal-container" tabindex="-1" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Image</h4>
+              </div>
+              <div class="modal-body">
+                <img id="modal-image" width="550>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <script type="text/javascript">
+            function openModal (imagePath) {
+                console.log(imagePath)
+                $('#modal-container').modal('show');
+                $('#modal-image').attr('src', imagePath);
+            }
+        </script>
+</div>
+{% endblock content %}

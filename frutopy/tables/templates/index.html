@@ -1,0 +1,134 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Fruitipy</title>
+
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'bootstrap/css/bootstrap-theme.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'bootstrap/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  </head>
+
+  <body>
+
+    <style type="text/css">
+      .navbar-title {color: #337ab7;
+                    font-family: Arial;}
+      b {color: #ffffff;}
+      .col-md-4 {text-align: center;
+                padding: none;}
+      .navbar {margin-bottom: 0;
+              border: 0;}
+
+      .footer {background-color: #455a64;
+              height: 20%;
+              position: absolute;
+              left: 0;
+              bottom: auto;
+              right: 0;}
+      .body {min-height: 100%;
+            height: auto;
+            height: 100%;}
+      .push {height: 480px;
+            clear: both;}
+      .fix {padding-right: 0;
+           width: auto;
+           margin: 0;}
+      .fix2 {padding-left: 0;
+           padding-right: 0;
+           width: auto;}
+      .dropdown-menu {width: 100%;
+                     text-align: center;}
+      body {background-image: url({% static 'images/sfondo.jpg' %});}
+
+    </style>
+    <div class="body">
+      <nav class="navbar navbar-default">
+        <br>
+        <div class="container-fluid fix row">
+          <div class="navbar-header col-md-1">
+            <a class="navbar-brand" href="/">
+              <img alt="FBK" src="{% static 'images/logoFBK-2.jpg' %}">
+            </a>
+          </div>
+          <div class="col-md-4 fix2">
+            <centre>
+              <h1 class="navbar-title">Fruitipy</h1>
+            </centre>
+          </div>
+        </div>
+        <br>
+      </nav>
+
+      <div class="container-fluid buttons">
+        <br>
+          <div class="row" id="menu_row">
+          <div id="adjust_bar">
+          <div class="col-md-6">
+            <a href="upload/"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Upload to database</b></button></a>
+          </div>
+          <div class="col-md-6">
+            <a href="about/"><button type="button" class="btn btn-primary btn-lg btn-block"><b>About</b></button></a>
+          </div>
+            </div>
+        <br>
+      </div>
+
+      <div class="push">
+      </div>
+    </div>
+
+      <footer class="footer">
+        <div class="container">
+          <br>
+          <div class="row">
+            <div class="col-md-4">
+              <b>Web Valley 2016</b>
+            </div>
+            <div class="col-md-4">
+              <b>FBK Foundation</b>
+            </div>
+            <div class="col-md-4">
+              <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu/</b></a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Modal -->
+      <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body" id="modal_body">
+              <p>Do you want to delete only the samples recorded or the entire database (also calibration parameters)?</p>
+              <button type="button" class="btn btn-default" style="color:green;" id="reset_samples">Only the sample</button>
+              <button type="button" class="btn btn-default" style="color:red;" id="reset_database">Entire database</button>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    <script src="{% static 'jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <script>
+    </script>
+  </body>
+</html>
