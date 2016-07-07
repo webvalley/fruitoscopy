@@ -8,6 +8,7 @@ from .models import ML_Model, SP_Model, Sample
 from tables.choices import RIPENESS_LABELS
 from .serializers import *
 import tempfile
+import os
 
 class SampleViewSet(viewsets.ModelViewSet):
     """
@@ -40,12 +41,7 @@ class SampleListView(View):
 
     def get(self, request):
         samples = Sample.objects.all()
-# import tempfile
-# import tarfile
-# import os
-# import shutil
-# from django.conf import settings
-# from utils import write_central_db, read_db, get_dir
+
         return render(request, self.template_name, context={'samples': samples})
 
     def post(self, request):
@@ -85,13 +81,21 @@ def handle_uploaded_file(f):
     """
     Handles uploaded file and triggers its processing.
     """
-    with tempfile.NamedTemporaryFile(delete=False) as destination:
-        name = destination.name
-        for chunk in f.chunks():
-            destination.write(chunk)
-            print('Saving to %s' % name)
-        process_file.delay(name)
 
+    # with tempfile.mkstemp() as destination:
+    #     name = destination.name
+    #     for chunk in f.chunks():
+    #         destination.write(chunk)
+    #         print('Saving to %s' % name)
+    #     # tfile = tarfile.open(name, 'r:gz')
+    #     process_file.delay(name)
+
+    fd, file_name = tempfile.mkstemp()
+
+    for chunk in f.chunks():
+        os.write(fd, chunk)
+    os.close(fd)
+    process_file.delay(file_name)
 
 def upload_file(request):
     """

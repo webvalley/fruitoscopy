@@ -8,13 +8,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Fruitoscopy</title>
+    <title>Fruitipy</title>
 
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{% static 'bootstrap/css/bootstrap.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{% static 'bootstrap/css/bootstrap-theme.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
-
+    <link href="{% static 'bootstrap/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
   </head>
 
   <body>
@@ -70,16 +70,15 @@
 
       <div class="container-fluid buttons">
         <br>
-        <div class="row">
-          <div class="col-md-4">
+          <div class="row" id="menu_row">
+          <div id="adjust_bar">
+          <div class="col-md-6">
             <a href="upload/"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Upload to database</b></button></a>
           </div>
-          <div class="col-md-4">
-            <a href="take_data/1"><button type="button" class="btn btn-primary btn-lg btn-block"><b>Upload to database</b></button></a>
-          </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <a href="about/"><button type="button" class="btn btn-primary btn-lg btn-block"><b>About</b></button></a>
           </div>
+            </div>
         <br>
       </div>
 
