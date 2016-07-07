@@ -97,14 +97,15 @@ def handle_uploaded_file(f):
     a = str(int(time.time()))
     os.makedirs(os.path.join(path, a))
     full_path = os.path.join(path, a)
-    with tarfile.TarFile(full_path + '/tmp_file.gz', 'w') as fd:
+    with open(full_path + '/tmp_file.gz', 'wb') as fd:
         string = BytesIO()
         for chunk in f.chunks():
-            string.write(chunk)
+            fd.write(chunk)
         string.seek(0)
-        info = tarfile.TarInfo(name="berry")
         #info.size = len(string)
-        fd.addfile(tarinfo=info, fileobj=string)
+        #info = tarfile.TarInfo(name='berry')
+        #info.type = tarfile.DIRTYPE
+        #fd.addfile(tarinfo=info, fileobj=string)
     process_file.delay(os.path.join(full_path, 'tmp_file.gz'))
 
 def upload_file(request):
@@ -118,6 +119,9 @@ def upload_file(request):
         return HttpResponseRedirect('/success')
     #print('not valid you idiot')
     return render(request, 'upload.html')
+
+def about(request):
+    return render(request, 'about.html')
 
 
 def success(request):

@@ -2,6 +2,7 @@
 {% load tablestags %}
 
 {% block content %}
+<div class="col-md-12">
     <h2>Samples List</h2>
     <form action="" method="post">
         {% csrf_token %}
@@ -69,4 +70,5 @@
                 $('#modal-image').attr('src', imagePath);
             }
         </script>
+</div>
 {% endblock content %}
