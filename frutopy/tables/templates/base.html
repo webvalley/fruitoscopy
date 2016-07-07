@@ -1,0 +1,70 @@
+{% load static %}
+{% load staticfiles %}
+<!doctype html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block title %}
+    <title>Fruitipy</title>
+    {% endblock title %}
+
+    <link href="{% static 'bootstrap/css/main.css' %}" type="text/css" rel="stylesheet"/>
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" type="text/css" rel="stylesheet"
+          media="screen,projection"/>
+    <link href="{% static 'bootstrap/css/bootstrap-theme.css' %}" type="text/css" rel="stylesheet"
+          media="screen,projection"/>
+    <script src="{% static 'jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <br>
+    <div class="container-fluid fix row">
+        <div class="navbar-header col-md-1">
+            <a class="navbar-brand" href="/">
+                <img alt="FBK" src="{% static 'images/logoFBK-2.jpg' %}">
+            </a>
+        </div>
+        <div class="col-md-4 fix2">
+            <h1 class="navbar-title">Fruitipy</h1>
+        </div>
+    </div>
+    <br>
+</nav>
+
+
+
+<div class="container">
+    {% if messages %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3" id="#please">
+        {% for message in messages %}
+                {% if message.tags == "success" %}
+                    <div class="alert alert-success alert-dismissible fade in" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        {{message}}
+                    </div>
+                {% endif %}
+        {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    <!-- Beginning of the page area -->
+    <div class="row">
+        <div class="col-md-12">
+        {% block content %}
+            {% endblock content %}
+        </div>
+    </div>
+    <!-- End of the page area -->
+</div>
+
+</body>
+
+</html>
