@@ -12,12 +12,14 @@ HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 #MODULO 1
 #LABELS SEPARATED FROM THE MATRIX
 def get_label(array):
-    '''
+
     with open(HOME_PATH + '/configuration/parameters.json') as data_file:
         dic = json.load(data_file)
-    bin_num = dic['num_bins']
-    '''
-    bin_num = 130
+    try:
+        bin_num = dic['num_bins']
+    except:
+        print("Error with json reading")
+        bin_num = 130
     # get spectra data from RaspberryPi
     test = array
 

@@ -270,8 +270,8 @@ def process_image(white_spectrum = 0):
             get_image()
             return -1, -1
 
-    #if not white_spectrum:
-    #    normalized = get_white_spectrum() / normalized
+    if not white_spectrum:
+        normalized = get_white_spectrum() / normalized
     script, div = save_plot(normalized, wl)
     #save_plot(normalized, wl)
     label = get_label(normalized)
