@@ -6,7 +6,9 @@ from datetime import datetime
 
 
 def get_dir(dest):
+    print(dest)
     for root, dirs, files in os.walk(dest):
+        print(dirs)
         return dirs[0], os.path.join(dest, dirs[0])
 
 def read_db(db_name, table_name='Samples'):

@@ -1,19 +1,24 @@
 from rest_framework import serializers
-from tables.models import Sample, ML_Model, SP_Model
+from tables import models
 
 
 class SampleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Sample
+        model = models.Sample
         fields = '__all__'
 
 
 class ML_ModelSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = ML_Model
+        model = models.ML_Model
         fields = '__all__'
 
 class SP_ModelSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = SP_Model
+        model = models.SP_Model
+        fields = '__all__'
+
+class ImageSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.Image
         fields = '__all__'

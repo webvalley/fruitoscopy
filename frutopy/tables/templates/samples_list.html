@@ -2,6 +2,7 @@
 {% load tablestags %}
 
 {% block content %}
+<div class="col-md-12">
     <h2>Samples List</h2>
     <form action="" method="post">
         {% csrf_token %}
@@ -54,7 +55,7 @@
                 <h4 class="modal-title">Image</h4>
               </div>
               <div class="modal-body">
-                <img id="modal-image">
+                <img id="modal-image" width="550>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -69,4 +70,5 @@
                 $('#modal-image').attr('src', imagePath);
             }
         </script>
+</div>
 {% endblock content %}
