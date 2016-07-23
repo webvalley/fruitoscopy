@@ -96,3 +96,4 @@ timestamp.txt
 *.tar
 *.npy
 *.pkl
+*.txt

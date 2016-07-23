@@ -78,12 +78,11 @@ def take_data(fruit):
     ----------
     - The confirmation HTML page
     """
-    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
+    if(not os.path.isfile(HOME_PATH + '/static/processed_white.jpg')):
         get_white = 1
     else:
         get_white = 0
 
-    get_white=0
     return render_template('take_data.html', fruit=fruit, get_white=get_white)
 
 
@@ -332,8 +331,7 @@ def calibrate_white():
 
 @app.route('/calibrate_white_done', methods=['GET', 'POST'])
 def calibrate_white_done():
-    processed = process_image(white_spectrum=1)
-    save_white(processed[1])
+    processed = get_image(white_calibration = 1)
     return "OK"
 
 if __name__ == "__main__":
@@ -351,8 +349,8 @@ if __name__ == "__main__":
         os.system("mkdir " + HOME_PATH + '/configuration')
     if(not os.path.isdir(HOME_PATH + '/temp_data')):
         os.system("mkdir " + HOME_PATH + '/temp_data')
-    if(os.path.isfile(HOME_PATH + '/white_cal.txt')):
-        os.system("rm " + HOME_PATH + '/white_cal.txt')
+    if(os.path.isfile(HOME_PATH + '/static/processed_white.jpg')):
+        os.system("rm " + HOME_PATH + '/static/processed_white.jpg')
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
         out_file = open(HOME_PATH + '/timestamp.txt',"w")
         out_file.write(str(0))

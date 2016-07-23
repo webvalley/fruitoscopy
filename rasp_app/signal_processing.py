@@ -7,16 +7,12 @@ import sqlite3 as lite
 from signal_processing import *
 import scipy.signal as sps
 import scipy.optimize as opt
-#from matplotlib.pylab import savefig
 from PIL import Image
 import numpy as np
-#import matplotlib.pyplot as plt
 from database_interactions import *
 from machine_learning import *
 from bokeh.plotting import figure
 from bokeh.embed import components
-#import matplotlib as mpl
-#mpl.use('Agg')
 from calibration import get_white_spectrum
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
@@ -144,7 +140,7 @@ def save_plot(array, wl=[],controls=0):
     return script, div
 
 
-def get_image(new_photo = 0):
+def get_image(new_photo = 0, white_calibration = 0):
     """
     This function receive as input some parameters as a tuple.
     The return value is the image of the spectrum.
@@ -165,12 +161,15 @@ def get_image(new_photo = 0):
     :value 0: Image of the spectrum
     """
     param = get_params()
-    if(new_photo):
+    if(new_photo or white_calibration):
         os.system("raspistill -awb off -awbg 1.,1. -t 5000 -ex verylong -o " + HOME_PATH + "source.jpg")
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
-    im.save(HOME_PATH + '/static/processed.jpg')
+    if white_calibration:
+        im.save(HOME_PATH + '/static/processed_white.jpg')
+    else:
+        im.save(HOME_PATH + '/static/processed.jpg')
 
     #Better not to resize, data is lost or altered too much
     #maxsize = (1000, im.size[0])
@@ -179,6 +178,53 @@ def get_image(new_photo = 0):
     #im.show()
     img_spectrum = im.load()
     return img_spectrum
+
+def filter_white(baseline):
+    """
+    This function receive as input the matrix of the pixels of the spectrum image, after being cropped, and some parameters as a tuple.
+    The return value is the spectrum.
+
+    The purpose of this function is to calculate the y values of the spectrum from the image
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Parameters of the tuple:
+    ----------
+    :param 0: Left margin of image to crop
+    :param 1: Top margin of image to crop
+    :param 2: Left margin of image to crop
+    :param 3: Bottom margin of image to crop
+    :param 4: Degrees to rotate the image (+ is CCW)
+
+    :Matrix:
+    ----------
+    r,g,b = matrix[col, row]
+    where "col" is column of the matrix and "row" is the row
+    r, g and b are the 3 components, red, green and blue of every pixel of the matrix
+
+    :Return values:
+    ----------
+    :value 0: List of y elements of the spectrum
+    """
+    im=Image.open(HOME_PATH + '/source.jpg')
+    img_white = im.load()
+
+    param=get_params()
+    rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]);
+    tot = [[] for x in range(param[2]-param[0])]
+    for col in range(param[2]-param[0]):
+        count=[0.,0.,0.]
+
+        for row in range(0,param[3]-param[1],1):
+            #b,g,r = img_spectrum[row,col]
+            r,g,b = img_white[col,row]
+            tot[col].append(r+g+b)
+
+    for i in range(tot):
+        baseline = max(tot[i]) / baseline[i]
+
+    return baseline
 
 def get_baseline(img_spectrum):
     """
@@ -219,10 +265,10 @@ def get_baseline(img_spectrum):
             r,g,b = img_spectrum[col,row]
             tot[col].append(r+g+b)
 
-    black_line = []
+    baseline = []
     for elem in tot:
-        black_line.append(max(elem))
-    return black_line
+        baseline.append(max(elem))
+    return baseline
 
 def process_image(white_spectrum = 0):
     """
@@ -251,9 +297,10 @@ def process_image(white_spectrum = 0):
     param = get_params()
     img_spectrum = get_image(new_photo=1)
 
-    black_line = get_baseline(img_spectrum)
+    baseline = get_baseline(img_spectrum)
+    filtered = filter_white(baseline)
     #plt.plot(black_line, color="blue")
-    almost_good = sps.savgol_filter(black_line, 51, 3)
+    almost_good = sps.savgol_filter(filtered, 51, 3)
     #plt.plot(almost_good, color="red")
     #savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
     wl = np.array(range(400,801))
@@ -275,8 +322,8 @@ def process_image(white_spectrum = 0):
 
     script, div = save_plot(normalized, wl)
     #save_plot(normalized, wl)
-    label = get_label(normalized)
-
+    #label = get_label(normalized)
+    label = 0
     return (label,normalized, script, div)
     #return (0,normalized)
 
