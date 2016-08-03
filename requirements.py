@@ -1,4 +1,5 @@
 backports.shutil-get-terminal-size==1.0.0
+bokeh==0.12.0
 click==6.6
 cycler==0.10.0
 dask==0.10.0

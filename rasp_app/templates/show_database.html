@@ -13,6 +13,8 @@
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.js') }}"></script>
   </head>
 
   <body>
@@ -49,9 +51,9 @@
       <nav class="navbar navbar-default">
         <br>
         <div class="container-fluid fix row">
-          <div class="navbar-header col-md-1">
+          <div>
             <a class="navbar-brand" href="/">
-              <img alt="FBK" src="{{url_for('static', filename='logoFBK-2.jpg') }}">
+              <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
             </a>
           </div>
           <div class="col-md-4 fix2">
@@ -69,32 +71,30 @@
       <span>   To: <span><input type="date" name="to_date" id="to_date" value="{{date_to}}">
       <button id="search_date">Search</button>
     </center>
-
+    <table class="table table-striped table-bordered" style="width:100%;">
+      <br><br>
     {% for row in rows %}
-      <table class="table table-bordered">
-        <br><br>
+
         <tr>
-          <td class="active">
+          <td>
               <p><b>ID:</b> {{row[0]}}</p>
           </td>
           <td>
               <p><b>Fruit:</b> {{row[2]}}</p>
           </td>
-          <td class="active">
+          <td>
               <p><b>Label:</b> {{row[3]}}</p>
           </td>
           <td>
               <p><b>Time:</b> {{row[5]}}</p>
           </td>
-          <td class="active">
-              <p><b>GPS:</b> {{row[4]}}</p>
-          </td>
           <td>
               <a href="#"><button data-toggle="modal" data-target="#myModal" onclick="more_info({{row[0]}})"><b>MORE INFO</b> for ID {{row[0]}}</button></a>
           </td>
         </tr>
-      </table>
+
     {% endfor %}
+    </table>
     <!-- Modal -->
     <div class="modal fade" id="myModal" role="dialog">
       <div class="modal-dialog">
@@ -132,28 +132,34 @@
           {id: id_db}
       );
       posting.done(function( data ) {
-          var res = data.split(",");
+          var res = data.split(",,");
 
           if(res[0]=="OK"){
-            var html = '<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">'
-            html += '<br><span class="details">Fruit: ' + res[1] + '</span>'
-            html += '<br><span class="details">Label: '
-            html += '<select class="form-control" id="fruit">'
-            html += '<option value="0"'
+            //var html = '<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">';
+            var html = res[9];
+            html+= res[8];
+            html += '<br><span class="details">Fruit: ' + res[1] + '</span>';
+            html += '<br><span class="details">Label: ';
+            html += '<select class="form-control" id="label_to_update">';
+            html += '<option value="0"';
             if(res[2] == 0){
-              html += 'selected="selected"'
+              html += 'selected="selected"';
             }
-            html += '>0 - Bad</option>'
-            html += '<option value="1"'
+            html += '>0 - Not ready Yet</option>';
+            html += '<option value="1"';
             if(res[2] == 1){
-              html += 'selected="selected"'
+              html += 'selected="selected"';
             }
-            html += '>1 - Good</option>'
-            html += '</select></span>'
-            html += '<br><span class="details">GPS: ' + res[3] + '</span>'
-            html += '<br><span class="details">Timestamp: ' + res[4] + '</span>'
-            html += '<br><span class="details">ML_model: ' + res[5] + '</span>'
-            html += '<br><span class="details">SP_model: ' + res[6] + '</span>'
+            html += '>1 - Ready to be harvested</option>';
+            html += '<option value=2>2 - Too ripe</option></select></span>'
+            html += '<button onclick="update_label(' + id_db +')">Update label</button>';
+            html += '<br><span class="details">GPS: ' + res[3] + '</span>';
+            html += '<br><span class="details">Timestamp: ' + res[4] + '</span>';
+            html += '<br><span class="details">ML_model: ' + res[5] + '</span>';
+            html += '<br><span class="details">SP_model: ' + res[6] + '</span>';
+            if(res[7] == 1){
+              html += '<br><img style="width:100%" src="/static/photo_associated.jpg?'+ new Date().getTime()+'"</span>';
+            }
             $('#modal_body').html(html);
           }
           else{

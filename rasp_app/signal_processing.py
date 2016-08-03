@@ -1,3 +1,4 @@
+from __future__ import division
 import os
 from flask import Flask, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
@@ -6,12 +7,13 @@ import sqlite3 as lite
 from signal_processing import *
 import scipy.signal as sps
 import scipy.optimize as opt
-from matplotlib.pylab import savefig
 from PIL import Image
 import numpy as np
-import matplotlib.pyplot as plt
 from database_interactions import *
 from machine_learning import *
+from bokeh.plotting import figure
+from bokeh.embed import components
+from calibration import get_white_spectrum
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -98,7 +100,7 @@ def remove_background(spectrum):
 
     return (background_rem)
 
-def save_plot(array, wl=[]):
+def save_plot(array, wl=[],controls=0):
     """
     This function receive as input an array.
     The return is nothing.
@@ -118,14 +120,27 @@ def save_plot(array, wl=[]):
     """
     if wl == []:
         wl = range(len(array))
-    plt.clf();plt.plot(wl,array,c='black')
+    #plt.clf();plt.plot(wl,array,c='black')
+    #savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
     #Uncomment to save csv arrays
     #f=open(HOME_PATH + '/static/spectrum.csv','a')
-    #f.write(",".join(map(str, array))+'\n')
-    #f.close()
-    savefig(HOME_PATH + '/static/spectrum.png', bbox_inches='tight')
+    '''
+    f.write(",".join(map(str, array))+'\n')
+    f.close()
+    '''
 
-def get_image():
+    p = figure(plot_width=400, plot_height=400, responsive=True)
+    p.toolbar.logo = None
+    if not controls:
+        p.toolbar_location = None
+    # add a line renderer
+    p.line(wl, array, line_width=2)
+
+    script, div = components(p)
+    return script, div
+
+
+def get_image(new_photo = 0, white_calibration = 0):
     """
     This function receive as input some parameters as a tuple.
     The return value is the image of the spectrum.
@@ -146,10 +161,15 @@ def get_image():
     :value 0: Image of the spectrum
     """
     param = get_params()
+    if(new_photo or white_calibration):
+        os.system("raspistill -awb off -awbg 1.,1. -t 5000 -ex verylong -o " + HOME_PATH + "source.jpg")
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
-    im.save(HOME_PATH + '/static/processed.jpg')
+    if white_calibration:
+        im.save(HOME_PATH + '/static/processed_white.jpg')
+    else:
+        im.save(HOME_PATH + '/static/processed.jpg')
 
     #Better not to resize, data is lost or altered too much
     #maxsize = (1000, im.size[0])
@@ -158,6 +178,53 @@ def get_image():
     #im.show()
     img_spectrum = im.load()
     return img_spectrum
+
+def filter_white(baseline):
+    """
+    This function receive as input the matrix of the pixels of the spectrum image, after being cropped, and some parameters as a tuple.
+    The return value is the spectrum.
+
+    The purpose of this function is to calculate the y values of the spectrum from the image
+
+    Specifically:
+    @@@@@@@@@@@@@
+
+    :Parameters of the tuple:
+    ----------
+    :param 0: Left margin of image to crop
+    :param 1: Top margin of image to crop
+    :param 2: Left margin of image to crop
+    :param 3: Bottom margin of image to crop
+    :param 4: Degrees to rotate the image (+ is CCW)
+
+    :Matrix:
+    ----------
+    r,g,b = matrix[col, row]
+    where "col" is column of the matrix and "row" is the row
+    r, g and b are the 3 components, red, green and blue of every pixel of the matrix
+
+    :Return values:
+    ----------
+    :value 0: List of y elements of the spectrum
+    """
+    im=Image.open(HOME_PATH + '/source.jpg')
+    img_white = im.load()
+
+    param=get_params()
+    rl=np.zeros(param[2]-param[0]);gl=np.zeros(param[2]-param[0]);bl=np.zeros(param[2]-param[0]);
+    tot = [[] for x in range(param[2]-param[0])]
+    for col in range(param[2]-param[0]):
+        count=[0.,0.,0.]
+
+        for row in range(0,param[3]-param[1],1):
+            #b,g,r = img_spectrum[row,col]
+            r,g,b = img_white[col,row]
+            tot[col].append(r+g+b)
+
+    for i in range(tot):
+        baseline = max(tot[i]) / baseline[i]
+
+    return baseline
 
 def get_baseline(img_spectrum):
     """
@@ -198,12 +265,12 @@ def get_baseline(img_spectrum):
             r,g,b = img_spectrum[col,row]
             tot[col].append(r+g+b)
 
-    black_line = []
+    baseline = []
     for elem in tot:
-        black_line.append(max(elem))
-    return black_line
+        baseline.append(max(elem))
+    return baseline
 
-def process_image():
+def process_image(white_spectrum = 0):
     """
     I will process the image, taking 1 tuple made of parameters as input.
     The return values will be the label of the sample and the spectrum
@@ -228,11 +295,12 @@ def process_image():
 
     #param = (800,1000,2400,1250,5) #left,top,right,bottom, rotate
     param = get_params()
-    img_spectrum = get_image()
+    img_spectrum = get_image(new_photo=1)
 
-    black_line = get_baseline(img_spectrum)
+    baseline = get_baseline(img_spectrum)
+    filtered = filter_white(baseline)
     #plt.plot(black_line, color="blue")
-    almost_good = sps.savgol_filter(black_line, 51, 3)
+    almost_good = sps.savgol_filter(filtered, 51, 3)
     #plt.plot(almost_good, color="red")
     #savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
     wl = np.array(range(400,801))
@@ -248,14 +316,16 @@ def process_image():
         if(normalized == -1):
             get_image()
             return -1, -1
-    plt.plot(background_rem)
-    #plt.plot(normalized)
-    #savefig(HOME_PATH + '/aabbb.png', bbox_inches='tight')
-    save_plot(normalized, wl)
 
-    get_label(normalized)
-    
-    return (0,normalized)
+    #if not white_spectrum:
+    #    normalized = get_white_spectrum() / normalized
+
+    script, div = save_plot(normalized, wl)
+    #save_plot(normalized, wl)
+    #label = get_label(normalized)
+    label = 0
+    return (label,normalized, script, div)
+    #return (0,normalized)
 
 def normalize(array, wl):
     """
@@ -290,8 +360,8 @@ def normalize(array, wl):
     param = get_spectrum_param()
     diff_param = param[1] - param[0]
 
-    begin = param[0] - diff_param * 0.375
-    end = param[1] + diff_param * 0.625
+    begin = param[0] - diff_param * 0.75
+    end = param[1] + diff_param * 2.25
 
     begin_px = int(begin*len(array)/1000)
     end_px = int(end*len(array)/1000)

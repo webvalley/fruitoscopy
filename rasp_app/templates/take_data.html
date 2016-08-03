@@ -13,9 +13,11 @@
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.js') }}"></script>
   </head>
 
-  <body>
+  <body onload="start_function({{ get_white }});get_geo()">
 
   <style type="text/css">
     .navbar-title {color: #337ab7;
@@ -64,7 +66,7 @@
       <div class="container-fluid fix row">
         <div class="navbar-header col-md-1">
           <a class="navbar-brand" href="/">
-            <img alt="FBK" src="{{url_for('static', filename='logoFBK-2.jpg') }}">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
           </a>
         </div>
         <div class="col-md-4 fix2">
@@ -83,6 +85,7 @@
             <select class="form-control" name="fruit" id="fruit" value= {{fruit}}>
               <option value="1">Raspberry</option>
               <option value="2">Grape</option>
+              <option value="3">Water Potential</option>
             </select>
             <!--<input type="number" name="field" id="field" class="form-control" placeholder="Field ID" value= {{field}}>-->
           </td>
@@ -90,38 +93,181 @@
         </tr>
       </table>
 
-    <div class="spectrum_div" id="spectrum_im">
-      <h2 style="text-align:center;margin-top:10vw;">Press "Take Sample" to start saving data</h2>
+    <div class="spectrum_div" id="spectrum_im" style="margin-bottom:5vw;">
+      <h2 style="text-align:center;margin-top:10vw; margin-bottom:15vw;">Press "Take Sample" to start saving data</h2>
     </div>
 
-    <!--<form class="navbar-form navbar-left" action="../data_taken" method=post enctype=multipart/form-data>
-      <div class="form-group">
-        <input type="number" name="field" class="form-control" placeholder="Field ID" value= {{field}}>
+    <footer class="footer">
+      <div class="container">
+        <br>
+        <div class="row">
+          <div class="col-md-4">
+            <b>Web Valley 2016</b>
+          </div>
+          <div class="col-md-4">
+            <b>FBK Foundation</b>
+          </div>
+          <div class="col-md-4">
+            <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu/</b></a>
+          </div>
+        </div>
       </div>
-      <button type="submit" class="btn btn-default">Take sample</button>
-    </form> -->
+    </footer>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add picture to data</h4>
+          </div>
+          <div class="modal-body" id="modal_body" style="text-align: center;">
+            <video id="video" style="margin-left:5%;margin-right:5%;width:90%;" autoplay></video>
+            <button id="snap" class="btn btn-default">Snap Photo</button>
+            <div>
+              <canvas id="canvas" style="display:none;" width="640" height="480"></canvas>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
     <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
+    function start_function(val){
+      if(val){
+        alert("White calibration is not already done!");
+        window.location.href = "/calibrate_white"
+      }
+    }
+    var got_position, latitude, longitude;
+    got_position = 0;
+    function success(position) {
+      got_position = 1;
+      latitude = position.coords.latitude;
+      longitude = position.coords.longitude;
+      accuracy = position.coords.accuracy;
+    }
+    function error(msg){
+      got_position = 0;
+      latitude = "";
+      longitude = "";
+      accuracy = "";
+    }
+    function get_geo(){
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error);
+      }
+      else{
+        alert("Nooooo");
+      }
+    }
     $("#take_sample").click(function(){
+        html = '<div id ="progress_bar"><h1 style="font-weight:500;font-size:200%">Getting spectrum, do not disconnect the device...</h1>'
+        html += '<div class="progress" id ="progress_bar">'
+        html += '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 50%">'
+        html += '</div></div></div'
+        $('#spectrum_im').html(html);
+
+        if(got_position){
+          gps = (latitude + ':' + longitude + ':' + accuracy);
+        }
+        else{
+          gps = "";
+        }
+
         var posting = $.post(
           '/data_taken',
-            {fruit: $("#fruit").val()}
+            {fruit: $("#fruit").val(), gps: gps}
         );
         posting.done(function( data ) {
-            if(data=="OK"){
-              $('#spectrum_im').html('<h2>RESULT: not implemented yet</h2><img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">');
+          res = data.split(',,');
+            if(res[0]=="OK"){
+
+              html = '<center><h2>RESULT:   '+ res[4] +'</h2>'
+              html += res[3];
+              html += res[2];
+              //html+='<img style="width:100%;height:100%;" src="/static/spectrum.png?'+ new Date().getTime()+'">'
+              //html += '<br><input type="file" id="file" name="file" class="file"/>'
+              html += '</center><center><div id="button_open_modal"><button data-toggle="modal" data-target="#myModal" id="upload_photo" onclick="get_video()" class="btn btn-default">Add photo to spectrum</button></div></center>'
+              html += '<input type=hidden id="id_db" value="' + res[1] + '"/>'
+
+              $('#spectrum_im').html(html);
             }
             else if(data=="CALIBRATION DONE"){
               alert("Calibration was wrong. Auto configuration tried to minimize the error. A new wavelenght calibration is needed!!!");
               window.location.href = "/calib_spectrum"
+            }
+            else if(res[0] == "NO"){
+              alert(res[1]);
+              window.location.href = "/"
             }
             else{
               alert("ERROR");
             }
         });
     });
+    function get_video(){
+      var canvas = document.getElementById("canvas"),
+		      context = canvas.getContext("2d"),
+          video = document.getElementById("video"),
+      		videoObj = { "video": true },
+      		errBack = function(error) {
+      			console.log("Video capture error: ", error.code);
+      		};
+
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+      if (navigator.getUserMedia) {
+          navigator.getUserMedia({video: true}, handleVideo, videoError);
+      }
+
+      function handleVideo(stream) {
+          video.src = window.URL.createObjectURL(stream);
+      }
+
+      function videoError(){
+        alert("There is a problem with the video")
+      }
+
+    }
+    $("#snap").click(function(){
+      var canvas = document.getElementById("canvas"),
+		      context = canvas.getContext("2d"),
+          video = document.getElementById("video");
+          context.drawImage(video, 0, 0, 640, 480);
+
+          var Pic = document.getElementById("canvas").toDataURL("image/png");
+
+            Pic = Pic.replace(/^data:image\/(png);base64,/, "");
+            $.ajax({
+                url: '/upload_img',
+                type: 'POST',
+                data: '{ "imageData" : "' + Pic + '" , "id_db" : "' + $('#id_db').val() + '"}',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (msg) {
+                    //alert("Done, Picture Uploaded.");
+                    $('#myModal').modal('hide');
+                    $('#button_open_modal').html('<div class="alert alert-success" role="alert">Photo associated to spectrum</div>');
+                },
+                error: function (jqXHR, status, err) {
+                    alert(err.message)
+                    alert(status)
+                    alert("Local error callback.");
+                }
+
+            });
+
+      });
+
     </script>
   </body>
 

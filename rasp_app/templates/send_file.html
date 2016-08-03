@@ -41,41 +41,29 @@
       <div class="container-fluid fix row">
         <div class="navbar-header col-md-1">
           <a class="navbar-brand" href="/">
-            <img alt="FBK" src="{{url_for('static', filename='logoFBK-2.jpg') }}">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
           </a>
         </div>
         <div class="col-md-4 fix2">
-          <centre>
-            <h1 class="navbar-title">Send Database</h1>
-          </centre>
+          <center>
+            <h1 class="navbar-title">Upload configuration file</h1>
+          </center>
         </div>
       </div>
       <br>
     </nav>
-    <div class="body row">
-      <div class="left col-md-3">
-
-      </div>
-      <div class="center col-md-6">
-        <center>
-          <form action="/db_uploaded" method=post enctype=multipart/form-data>
-              <input class="input" type=text name=user placeholder="Username" style="width: 50%;">
-              <br>
-              <input class="input" type=password name=pass placeholder="Password" style="width: 50%;">
-              <br>
+    <div style="width:50vw;margin-left:auto;margin-right:auto;margin-top:20vh;">
+      <center>
+        <div id="file_div">
+          <form action="/send_file_done" method=post enctype=multipart/form-data>
               <input class="input" type=file name=file>
               <input type=submit type="button" class="btn btn-primary btn-lg btn-block" value=Upload>
-              <br>
-              <br>
-              <div class="alert alert-danger" role="alert">Username and password not implemented yet</div>
           </form>
-
-        </center>
-      </div>
-      <div class="right col-md-3">
-
-      </div>
+        </div>
+      </center>
     </div>
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
   </body>
 
 </html>

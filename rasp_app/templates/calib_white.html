@@ -1,0 +1,120 @@
+<!doctype html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Take new sample</title>
+
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.js') }}"></script>
+  </head>
+
+  <body>
+
+  <style type="text/css">
+    .navbar-title {color: #337ab7;
+                  font-family: Arial;}
+    .col-md-4 {text-align: center;
+              padding: none;}
+    .navbar {margin-bottom: 0;
+            border: 0;}
+    .buttons {background-color: #ffffff;}
+    .footer {background-color: #455a64;
+            height: 20%;
+            position: absolute;
+            left: 0;
+            bottom: auto;
+            right: 0;}
+    .body {min-height: 100%;
+          height: auto;
+          height: 100%;}
+    .push {height: 480px;
+          clear: both;}
+    .fix {padding-right: 0;
+         width: auto;
+         margin: 0;}
+    .fix2 {padding-left: 0;
+         padding-right: 0;
+         width: auto;}
+    .dropdown-menu {width: 400px;
+                   text-align: center;}
+    table {width: 100%;}
+    td {width: 33%;
+       text-align: center;
+       margin-top: auto;}
+    .form-control {margin-inline-start: 20%;
+                  margin-inline-end: 20%;
+                  margin-top: 5%;
+                  margin-bottom: 5%;}
+    .spectrum_div {
+      width: 50vw;
+      margin-left:auto;
+      margin-right:auto;
+    }
+  </style>
+
+    <nav class="navbar navbar-default">
+      <br>
+      <div class="container-fluid fix row">
+        <div class="navbar-header col-md-1">
+          <a class="navbar-brand" href="/">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
+          </a>
+        </div>
+        <div class="col-md-4 fix2">
+          <centre>
+            <h1 class="navbar-title">Take sample</h1>
+          </centre>
+        </div>
+      </div>
+      <br>
+    </nav>
+    <div style="width: 40vw;margin-top:30vh;margin-bottom:30vh;margin-left:auto;margin-right:auto;">
+      <button id="white_cal_button" type="button" class="btn btn-primary btn-lg btn-block"><b>Calibrate white</b></button>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <br>
+        <div class="row">
+          <div class="col-md-4">
+            <b>Web Valley 2016</b>
+          </div>
+          <div class="col-md-4">
+            <b>FBK Foundation</b>
+          </div>
+          <div class="col-md-4">
+            <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu/</b></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+    $("#white_cal_button").click(function(){
+        var posting = $.post(
+          '/calibrate_white_done',
+            {yes: "yes"}
+        );
+        posting.done(function( data ) {
+              if(data == "OK"){
+                alert("Calibration was successful")
+              }
+              else{
+                alert("Error")
+              }
+        });
+    });
+    </script>
+  </body>
+
+</html>

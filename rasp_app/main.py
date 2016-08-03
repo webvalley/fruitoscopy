@@ -9,90 +9,20 @@ from PIL import Image
 import datetime
 from signal_processing import *
 from database_interactions import *
+from export_db import prepare_download_tar
+import base64
+import json
+from shutil import copyfile
+from utils import *
+from apply_config import *
+import random
 
-UPLOAD_FOLDER = ''
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','db'])
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = HOME_PATH + '/temp_data'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def time_now():
-    """
-    This function receive as input nothing.
-    The return is the current timestamp.
-
-    The purpose of this function is to get the timestamp from the raspberry without asking to any device.
-    To do so a sync is needed.
-
-    The timestamp is calculated knowing the difference between the raspberry timestamp and the phone timestamp.
-    Fianal timestamp = raspberry_timestamp + difference_in_timestamp
-
-    Specifically:
-    @@@@@@@@@@@@@
-
-    :Return values:
-    ----------
-    - The current timestamp
-    """
-    in_file = open(HOME_PATH + "/timestamp.txt","r")
-    text = in_file.read()
-    from_file = int(text)
-    time_to_send = int(time.time()) + from_file
-    return time_to_send
-
-def update_time(timestamp):
-    """
-    This function receive as input the current timestamp of the device connected to the raspberry.
-    No return is given
-
-    The purpose of this function is to update the file with the difference of the tymestamp between the device and the raspberry
-    to get a precise metadata
-
-    Specifically:
-    @@@@@@@@@@@@@
-
-    :Values in input:
-    ----------
-    :value 0: The timestamp of the phone/PC
-
-    :Return values:
-    ----------
-    - nothing
-    """
-    out_file = open(HOME_PATH + "/timestamp.txt","w")
-    diff_time = int(float(timestamp))-int(time.time())
-    out_file.write(str(diff_time))
-    out_file.close()
-
-@app.route('/db_uploaded', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return 'No file part'
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        try:
-            if len(file.filename)<2:
-                try:
-                    flash('No selected file')
-                    return "No selected file"
-                except:
-                    return "Unable to flash"
-        except:
-            return "Unable to work with empty file"
-
-        try:
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(HOME_PATH + "/databases", filename))
-                return 'Everything worked, but your file will be deleted because the system is not ready yet'
-        except:
-            return "unable to work with full file"
-    return "Not a POST request"
 
 @app.route('/data_taken', methods=['GET', 'POST'])
 def data_taken():
@@ -103,19 +33,29 @@ def data_taken():
     TODO: return also machine learning prediction
     """
 
-    fruit = int(request.form['fruit'])
-    gps = "n/d"
+    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
+        return "NO,,White calibration is needed"
+
+    fruit = int(request.form.get('fruit'))
+    gps = request.form.get('gps')
+    if gps == None:
+        gps = ""
     tmstp = time_now()
     processed = process_image()
     if(processed[0] == -1):
         return "CALIBRATION DONE"
     spectrum = processed[1].tolist()
-    if processed[0]:
-        result = "IS RIPE"
+    if processed[0] == 1:
+        result = "READY TO BE HARVESTED"
+    elif processed[0] == 0:
+        result = "NOT GOOD"
     else:
-        result = "NOT RIPE YET"
+        result = "TOO GOOD TO BE EATEN"
+
+
     insert_in_database(fruit=fruit, spectrum=spectrum, gps=gps, tmstp=tmstp, label=processed[0])
-    return "OK"
+    return ("OK,," + str(get_last_id_inserted()) +',,' + processed[2] +',,' + processed[3] + ",," + result)
+    #return ("OK,," + str(get_last_id_inserted()))
     #return render_template('data_taken.html', field=field, result=result)
 
 @app.route('/take_data', defaults={'fruit': 1})
@@ -138,7 +78,12 @@ def take_data(fruit):
     ----------
     - The confirmation HTML page
     """
-    return render_template('take_data.html', fruit=fruit)
+    if(not os.path.isfile(HOME_PATH + '/static/processed_white.jpg')):
+        get_white = 1
+    else:
+        get_white = 0
+
+    return render_template('take_data.html', fruit=fruit, get_white=get_white)
 
 
 @app.route('/sync_timestamp', methods=['GET', 'POST'])
@@ -178,14 +123,43 @@ def download_db():
     """
     show the page to download the database from the raspberry into the device
     """
+    prepare_download_tar()
     return render_template('get_db.html')
 
-@app.route('/send_db')
-def upload_db():
+@app.route('/send_file')
+def upload_conf_file():
+    """
+    Show the page to send a new configuration file
+    """
+    return render_template('send_file.html')
+
+@app.route('/send_file_done', methods=['GET', 'POST'])
+def upload_conf_file_done():
     """
     Show the page to send the database to the server (the django one that will be deployed)
     """
-    return render_template('send_db.html')
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return 'No file part'
+        file = request.files.get('file')
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file == None:
+            return "No selected file"
+
+
+        if file and ("config" in file.filename and ".tar" in file.filename):
+            #filename = secure_filename(file.filename)
+            filename = file.filename
+            file.save(os.path.join(HOME_PATH + "/temp_data", filename))
+            result = apply_configuration(filename = filename)
+            if result == 1:
+                return render_template('send_file_done.html')
+            else:
+                return "Error"
+    return "Error"
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -253,9 +227,12 @@ def show_more_info():
     data = get_data_by_id(id_db)
     spectrum =  data[1].split(",")
     spectrum = [float(x) for x in spectrum]
-    save_plot(spectrum, range(400,801))
-
-    return ("OK,%d,%d,%s,%d,%d,%d" % (data[2],data[3],data[4],data[5],data[6],data[7]))
+    script, div = save_plot(spectrum, range(400,801),controls=1)
+    photo = 0
+    if(data[8] != None):
+        copyfile(HOME_PATH + '/images/' +str(data[8]), HOME_PATH + '/static/photo_associated.jpg')
+        photo = 1
+    return ("OK,,%d,,%d,,%s,,%d,,%d,,%d,,%d,,%s,,%s" % (data[2],data[3],data[4],data[5],data[6],data[7],photo,script,div))
     #return render_template('more_info_from_row.html', id_db=id_db)
 
 @app.route('/delete_data/<int:id_db>')
@@ -323,14 +300,59 @@ def update_label():
     label_update_db(id,label)
     return "OK"
 
+@app.route('/upload_img', methods=['GET', 'POST'])
+def upload_img():
+    received = request.get_json()
+    img = received['imageData']
+    id = received['id_db']
+    #id = id[1:]
+    g = open("out.png", "wb")
+    g.write(base64.b64decode(img))
+    g.close()
+    im = Image.open('out.png')
+    im.save('out.jpg')
+    insert_image(id)
+    msg = 'Image uploaded'
+    status = "success"
+    return json.dumps({"status" : status, "msg" : msg})
+
+@app.route('/get_just_image', methods=['GET', 'POST'])
+def get_just_image():
+    get = request.form.get('get')
+    if(get == 'yes'):
+        get_image(new_photo=1)
+        return "OK"
+    else:
+        return "Error, post request was not made correctly"
+
+@app.route('/calibrate_white')
+def calibrate_white():
+    return render_template('calib_white.html')
+
+@app.route('/calibrate_white_done', methods=['GET', 'POST'])
+def calibrate_white_done():
+    processed = get_image(white_calibration = 1)
+    return "OK"
+
 if __name__ == "__main__":
     """
     Just start the server open to everyone, on the port 5000
     """
     if(not os.path.isfile(HOME_PATH + '/static/samples.db')):
         create_database_first_time()
+    if(not os.path.isfile(HOME_PATH + '/source.jpg')):
+        print("Getting first source")
+        get_image(new_photo=1)
+    if(not os.path.isdir(HOME_PATH + '/images')):
+        os.system("mkdir " + HOME_PATH + '/images')
+    if(not os.path.isdir(HOME_PATH + '/configuration')):
+        os.system("mkdir " + HOME_PATH + '/configuration')
+    if(not os.path.isdir(HOME_PATH + '/temp_data')):
+        os.system("mkdir " + HOME_PATH + '/temp_data')
+    if(os.path.isfile(HOME_PATH + '/static/processed_white.jpg')):
+        os.system("rm " + HOME_PATH + '/static/processed_white.jpg')
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
-        out_file = open(HOME_PATH + "/timestamp.txt","w")
+        out_file = open(HOME_PATH + '/timestamp.txt',"w")
         out_file.write(str(0))
         out_file.close()
     app.run(host='0.0.0.0')
