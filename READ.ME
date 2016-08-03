@@ -1,0 +1,252 @@
+To install the software on the Raspberry Pi you need to:
+
+    $ sudo apt-get install python-numpy python-scipy
+
+    $ sudo pip install flask scikit-learn
+
+
+Follow the guide on http://elinux.org/RPI-Wireless-Hotspot to configure the Raspberry Pi as Hotspot (point n° 4 is not mandatory, since the raspberry server is made to work offline)
+
+Clone the fruitoscopy repository (better in /home/pi/ )
+
+    git clone {{ insert here repository }}
+
+
+Add to the /etc/rc.local these lines before the " exit 0 "
+
+    $ sudo ifconfig wlan0 192.168.42.1
+    
+    $ sudo service udhcpd stop
+    
+    $ sudo service udhcpd start
+    
+    python /home/pi/fruitoscopy/rasp_app/main.py
+
+
+(You have to execute the main.py that you have cloned from the GitHub repository, if the path where you have cloned the repo is different, use yours)
+
+-------------------------------------
+        INSTALL GUNICORN AND NGINX
+
+    $ sudo apt-get install gunicorn nginx
+    
+    #nano PROJ_PATH/wsgi.py
+    
+    #__init__.py
+    
+    $ sudo nano /usr/lib/systemd/system/rasp_app.service
+    
+        [Unit]
+        Description=gunicorn daemon
+        Requires=rasp_app.sock
+        After=network.target
+
+        [Service]
+        PIDFile=/run/gunicorn/pid
+        User=root
+        Group=root
+        WorkingDirectory=/home/pi/fruitoscopy/rasp_app
+        ExecStart=/usr/local/bin/gunicorn --pid /run/gunicorn/pid wsgi
+        ExecReload=/bin/kill -s HUP $MAINPID
+        ExecStop=/bin/kill -s TERM $MAINPID
+        PrivateTmp=true
+
+        [Install]
+        WantedBy=multi-user.target
+        
+    @@@@@@create /home/pi/fruitoscopy/rasp_app.sh
+    
+    @@@@@@create /home/pi/gunicor_start.sh
+    
+    $ sudo nano /usr/lib/systemd/system/rasp_app.sock
+        
+        [Unit]
+        Description=gunicorn socket
+
+        [Socket]
+        ListenStream=/run/gunicorn/socket
+        ListenStream=unix:rasp_app.sock
+        ListenStream=[::]:8000
+
+        [Install]
+        WantedBy=sockets.target
+    
+    $ sudo chmod 660 /usr/lib/systemd/system/rasp_app.sock
+    
+    $ sudo nano /etc/nginx/nginx.conf
+        
+        user www-data;
+        worker_processes 4;
+        pid /run/nginx.pid;
+
+        events {
+	        worker_connections 768;
+        }
+
+        http {
+
+	        ##
+	        # Basic Settings
+	        ##
+
+	        sendfile on;
+	        tcp_nopush on;
+	        tcp_nodelay on;
+	        keepalive_timeout 65;
+	        types_hash_max_size 2048;
+	        
+	        include /etc/nginx/mime.types;
+	        default_type application/octet-stream;
+
+	        ##
+	        # SSL Settings
+	        ##
+
+	        ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+	        ssl_prefer_server_ciphers on;
+
+	        ##
+	        # Logging Settings
+	        ##
+
+	        access_log /var/log/nginx/access.log;
+	        error_log /var/log/nginx/error.log;
+
+	        ##
+	        # Gzip Settings
+	        ##
+
+	        gzip on;
+	        gzip_disable "msie6";
+	        
+	        ##
+	        # Virtual Host Configs
+	        ##
+
+	        include /etc/nginx/conf.d/*.conf;
+	        include /etc/nginx/sites-enabled/*;
+        }
+
+        
+        
+    $ sudo nano /etc/nginx/sites-available/rasp_app.conf
+    
+        # Default server configuration
+        #
+
+        server {
+	        listen 80;
+	        
+	        root /var/www/html;
+	        
+
+	        server_name fruitipy.fbk.eu;
+
+	        location / {
+		        include proxy_params;
+		        proxy_pass http://127.0.0.1:8000;
+	        }
+        }
+    
+    
+    $ sudo ln -s /etc/nginx/sites-available/rasp_app.conf /etc/nginx/sites-enabled/rasp_app.conf
+    
+    
+    $ sudo chmod 777 rasp_app.service
+    
+    $ sudo chmod -R 777 /run/gunicorn/
+    
+    $ sudo nano /etc/udhcpd.conf
+    
+        # Sample udhcpd configuration file (/etc/udhcpd.conf)
+
+        # The start and end of the IP lease block
+
+        start		192.168.42.2	#default: 192.168.0.20
+        end		192.168.42.20	#default: 192.168.0.254
+
+        interface	wlan0		#default: eth0
+
+        #max_leases	254		#default: 254
+
+        remaining	yes		#default: yes
+
+        #auto_time	7200		#default: 7200 (2 hours)
+
+        #decline_time	3600		#default: 3600 (1 hour)
+        
+        #conflict_time	3600		#default: 3600 (1 hour)
+
+        #offer_time	60		#default: 60 (1 minute)
+
+        #min_lease	60		#defult: 60
+
+        #lease_file	/var/lib/misc/udhcpd.leases	#defualt: /var/lib/misc/udhcpd.leases
+        
+        #pidfile	/var/run/udhcpd.pid	#default: /var/run/udhcpd.pid
+
+        #notify_file				#default: (no script)
+
+        #notify_file	dumpleases	# <--- useful for debugging
+
+        #siaddr		192.168.0.22		#default: 0.0.0.0
+
+        #sname		zorak			#default: (none)
+
+        #boot_file	/var/nfs_root		#default: (none)
+
+        #Examles
+        opt	dns	192.168.42.1
+        option	subnet	255.255.255.0
+        opt	router	192.168.42.1
+        opt	wins	192.168.10.10
+        option	dns	129.219.13.81	# appened to above DNS servers for a total of 3
+        option	domain	local
+        option	lease	864000		# 10 days of seconds
+        
+-------------------------------------
+        INSTALL GUIDE FOR DNS REDIRECT TO fruitipy.fbk.eu
+
+    $ sudo apt-get install pdns-server dnsutils
+    
+    $ sudo sed -i 's/# recursor=/recursor=8.8.8.8/g' /etc/powerdns/pdns.conf
+    $ sudo sed -i 's/allow-recursion=127.0.0.1/allow-recursion=127.0.0.1,192.168.0.0\/24/g' /etc/powerdns/pdns.conf
+    
+    $ sudo service pdns restart
+    
+    ----> /etc/powerdns/bindbackend.conf
+    
+    
+        zone "fbk.eu" {
+               type master;
+               file "/etc/powerdns/bind/example.com.zone";
+               allow-update { none; };
+        };
+    
+    
+    $ sudo mkdir /etc/powerdns/bind
+    
+    ----> /etc/powerdns/bind/fbk.eu.zone
+    
+    
+        ORIGIN fbk.eu     ; base for unqualified names
+        $TTL 1h                 ; default time-to-live
+        @                       IN      SOA ns.example.com hostmaster.example.com (
+                                       1; serial
+                                       1d; refresh
+                                       2h; retry
+                                       4w; expire
+                                       1h; minimum time-to-live
+                               )
+                               IN      NS      ns
+                               IN      A       192.168.42.1
+        ns                      IN      A       192.168.42.1
+        fruitipy                IN      A       192.168.42.1
+        www             IN      CNAME   fruitipy
+        
+    
+    $ sudo service pdns restart
+    
+    $ sudo systemctl enable pdns.service
+    
+Francesco Ballerin - francesco@ballerin.it

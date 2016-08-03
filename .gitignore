@@ -95,6 +95,12 @@ ENV/
 
 #Others
 *.jpg
+*.png
 *.db
 *.sqlite3
 media/
+timestamp.txt
+*.tar
+*.npy
+*.pkl
+*.txt

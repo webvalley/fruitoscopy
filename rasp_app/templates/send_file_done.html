@@ -1,0 +1,68 @@
+<!doctype html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Send db to main server</title>
+
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  </head>
+
+  <body>
+    <style type="text/css">
+      .navbar-title {color: #337ab7;
+                    font-family: Arial;}
+      b {color: #ffffff;}
+      .col-md-4 {text-align: center;
+                padding: none;}
+      .navbar {margin-bottom: 0;
+              border: 0;}
+      .fix {padding-right: 0;
+           width: auto;
+           margin: 0;}
+      .fix2 {padding-left: 0;
+           padding-right: 0;
+           width: auto;}
+      .center {margin-top: 10%;}
+      .btn {width: 50%;
+           margin-top: 5%;}
+      .input {margin-top: 5%;}
+      .body {margin: 0;}
+    </style>
+    <nav class="navbar navbar-default">
+      <br>
+      <div class="container-fluid fix row">
+        <div>
+          <a class="navbar-brand" href="/">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
+          </a>
+        </div>
+        <div class="col-md-4 fix2">
+          <centre>
+            <h1 class="navbar-title">Upload configuration file</h1>
+          </centre>
+        </div>
+      </div>
+      <br>
+    </nav>
+    <div style="width:60vw;margin-left:auto;margin-right:auto;margin-top:20vh;">
+      <center>
+        <div id="file_div">
+          <div class="alert alert-success">
+            <strong>File uploaded correctly</strong>
+          </div>
+        </div>
+      </center>
+    </div>
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+  </body>
+
+</html>

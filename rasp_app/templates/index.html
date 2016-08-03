@@ -56,12 +56,12 @@
         <div class="container-fluid fix row">
           <div class="navbar-header col-md-1">
             <a class="navbar-brand" href="/">
-              <img alt="FBK" src="{{url_for('static', filename='logoFBK-2.jpg') }}">
+              <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
             </a>
           </div>
           <div class="col-md-4 fix2">
             <centre>
-              <h1 class="navbar-title">Spectroscope index</h1>
+              <h1 class="navbar-title">Fruitipy index</h1>
             </centre>
           </div>
         </div>
@@ -83,15 +83,15 @@
                 <br>
               </a>
               <li role="separator" class="divider"></li>
-              <a style="text-align: center" href="{{url_for('static', filename='samples.db') }}">
+              <a style="text-align: center" href="/get_db">
                 <br>
                   <li>Download Data</li>
                 <br>
               </a>
               <li role="separator" class="divider"></li>
-              <a href="send_db">
+              <a href="send_file">
                 <br>
-                  <li>Send Data</li>
+                  <li>Send new calibration File</li>
                 <br>
               </a>
             </ul>
@@ -107,7 +107,13 @@
               <li role="separator" class="divider"></li>
               <a href="calib_spectrum">
                 <br>
-                  <li>Calibrate wavelenght</li>
+                  <li>Calibrate wavelength</li>
+                <br>
+              </a>
+              <li role="separator" class="divider"></li>
+              <a href="calibrate_white">
+                <br>
+                  <li>Calibrate White Spectrum</li>
                 <br>
               </a>
               <li role="separator" class="divider"></li>
@@ -117,7 +123,12 @@
                 <br>
               </a>
               <li role="separator" class="divider"></li>
-
+              <a id="get_just_image" href="#">
+                <br>
+                  <li>Get image without saving spectra (for calibration)</li>
+                <br>
+              </a>
+              <li role="separator" class="divider"></li>
               <a data-toggle="modal" data-target="#myModal" href="#">
                 <br>
                   <li>Reset database</li>
@@ -163,6 +174,7 @@
             </div>
             <div class="modal-body" id="modal_body">
               <p>Do you want to delete only the samples recorded or the entire database (also calibration parameters)?</p>
+              <p style="color:white;">Questo in realtà è uno specktrometro (misura il livello di freschezza dello speck) :) </p>
               <button type="button" class="btn btn-default" style="color:green;" id="reset_samples">Only the sample</button>
               <button type="button" class="btn btn-default" style="color:red;" id="reset_database">Entire database</button>
             </div>
@@ -214,6 +226,20 @@
             });
           }
         });
+        $("#get_just_image").click(function(){
+          var posting = $.post(
+            '/get_just_image',
+              {get: "yes"}
+          );
+          posting.done(function( data ) {
+              if(data=="OK"){
+                  alert("Image for calibration has been taken");
+              }
+              else{
+                alert(data);
+              }
+          });
+      });
     </script>
   </body>
 </html>

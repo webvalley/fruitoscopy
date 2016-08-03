@@ -4,6 +4,8 @@ import time
 import datetime
 import sqlite3 as lite
 import numpy as np
+from shutil import copyfile
+from utils import time_now
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
@@ -257,6 +259,9 @@ def reset_samples():
     to_execute = ("DELETE FROM Samples")
     cur.execute(to_execute)
     con.commit()
+    to_execute = ("UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='Samples'")
+    cur.execute(to_execute)
+    con.commit()
     con.close()
 
 def reset_all_database():
@@ -268,7 +273,7 @@ def reset_all_database():
 def create_database_first_time():
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
-    to_execute = ("CREATE TABLE Samples (id INTEGER PRIMARY KEY AUTOINCREMENT, spectrum VARCHAR, fruit INTEGER, label INTEGER, gps INTEGER, tmstp INTEGER, ml_model INTEGER, sp_model INTEGER)")
+    to_execute = ("CREATE TABLE Samples (id INTEGER PRIMARY KEY AUTOINCREMENT, spectrum VARCHAR, fruit INTEGER, label INTEGER, gps INTEGER, tmstp INTEGER, ml_model INTEGER, sp_model INTEGER, image VARCHAR)")
     cur.execute(to_execute)
     to_execute = ("CREATE TABLE Spectrum (Blue INTEGER, Red INTEGER)")
     cur.execute(to_execute)
@@ -285,6 +290,26 @@ def label_update_db(id, label):
     con= lite.connect(HOME_PATH + "/static/samples.db")
     cur = con.cursor()
     to_execute = ("UPDATE Samples SET label=%d WHERE id=%d" % (int(label),int(id)))
+    cur.execute(to_execute)
+    con.commit()
+    con.close()
+
+def get_last_id_inserted():
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("SELECT MAX(id) FROM Samples")
+    cur.execute(to_execute)
+    con.commit()
+    num = cur.fetchone()
+    con.close()
+    return num[0]
+
+def insert_image(id):
+    name = "image_" + str(time_now()) + ".jpg"
+    copyfile(HOME_PATH + '/out.jpg', HOME_PATH + '/images/' + name)
+    con= lite.connect(HOME_PATH + "/static/samples.db")
+    cur = con.cursor()
+    to_execute = ("UPDATE Samples SET image=\"%s\" WHERE id=%d" % (name,int(id)))
     cur.execute(to_execute)
     con.commit()
     con.close()
