@@ -174,8 +174,8 @@ def get_image(new_photo = False, white_calibration = False):
     else:
         im.save(HOME_PATH + '/static/processed.png')
 
-    #Better not to resize, data is lost or altered too much
     #maxsize = (1000, im.size[0])
+    #Better not to resize, data is lost or altered too much
     #im = im.resize(maxsize, Image.ANTIALIAS)
 
     #im.show()
@@ -226,7 +226,6 @@ def filter_white(baseline):
 
     filtered = []
     for to,ba in zip(tot,baseline):
-        print("%f --- %f" %(max(to),ba))
         filtered.append(max(to) / ba)
 
     return filtered
@@ -303,7 +302,10 @@ def process_image(white_spectrum = 0):
     img_spectrum = get_image(new_photo=1)
 
     baseline = get_baseline(img_spectrum)
-    filtered = filter_white(baseline)
+    #filtered = filter_white(baseline)
+
+    filtered = baseline #Uncomment not to use white calibration and get only raw values
+
     #plt.plot(black_line, color="blue")
     #print(baseline)
     #print()
@@ -311,7 +313,7 @@ def process_image(white_spectrum = 0):
     almost_good = sps.savgol_filter(filtered, 51, 3)
     #plt.plot(almost_good, color="red")
     #savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
-    wl = np.array(range(400,801))
+    wl = np.array(range(400,651))
 
     background_rem = remove_background(almost_good)
 
@@ -367,8 +369,8 @@ def normalize(array, wl):
     param = get_spectrum_param()
     diff_param = param[1] - param[0]
 
-    begin = param[0] - diff_param * 0.75
-    end = param[1] + diff_param * 2.25
+    begin = param[0] - diff_param * 0.327
+    end = param[1] + diff_param * 0.945
 
     begin_px = int(begin*len(array)/1000)
     end_px = int(end*len(array)/1000)
