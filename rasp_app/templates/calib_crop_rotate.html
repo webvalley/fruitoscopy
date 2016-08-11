@@ -16,27 +16,28 @@
   </head>
 
   <body onload="get_new_image()">
-      <nav class="navbar navbar-default">
-        <br>
+    <nav class="navbar navbar-default">
+      <br>
+      <div class="container-fluid row" style="padding:0;margin:0;">
         <div>
-          <div class="navbar-header col-md-1">
-            <a class="navbar-brand" href="/">
-              <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
-            </a>
-          </div>
-          <div class="col-md-4 fix2">
-            <centre>
-              <h1 class="navbar-title">Spectrum area calibration</h1>
-            </centre>
-          </div>
+          <a class="navbar-brand" href="/">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;margin-left:2vw;" src="{{url_for('static', filename='logoFBK-2.png') }}">
+          </a>
         </div>
-        <br>
-      </nav>
+        <div class="navbar-header col-md-5" style="padding:0;margin:0;">
+          <centre>
+            <h1 class="navbar-title">Image Area Calibration</h1>
+          </centre>
+        </div>
+      </div>
+      <br>
+    </nav>
+    <div class="wrapper">
       <center>
         <div id="spectrum_div">
         </div>
       </center>
-      <div style="width:70vw;margin-left:auto;margin-right:auto;">
+      <div style="width:70vw;margin-left:auto;margin-right:auto;margin-bottom:3vh;">
         <hr style="border: #c5c1be solid 2px!important;">
         <div style="text-align:center;"><span class="big_span">Left side</span>
         <div style="float:right;"><span class="big_span">--</span></div>
@@ -63,55 +64,54 @@
         <div style="float:left;"><span class="big_span">CW ↻</span></div></div>
         <input type=range min="-15" max="15" name=param_4 id=rot value= {{param[4]}} onchange="update_image()">
         <hr style="border: #c5c1be solid 2px!important;">
+        <br>
+        <a href="/"><button class="btn btn-primary btn-lg btn-block" style="width:40vw;margin-left:auto;margin-right:auto;">Go back to index</button></a>
       </div>
-      <br>
-      <!--<button type="submit" id="submit" name="submit">Upload changes</button>-->
-      <a href="/"><button class="btn btn-primary btn-lg btn-block" style="width:40vw;margin-left:auto;margin-right:auto;">Go back to index</button></a>
-      <br>
-      <br>
-      <footer class="footer">
-        <div class="container">
-          <br>
-          <div class="row">
-            <div class="col-md-4">
-              <b>Web Valley 2016</b>
-            </div>
-            <div class="col-md-4">
-              <b>FBK Foundation</b>
-            </div>
-            <div class="col-md-4">
-              <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu/</b></a>
-            </div>
+      <div class="push"></div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <br>
+        <div class="row">
+          <div class="col-md-4">
+            <b>Web Valley 2016</b>
+          </div>
+          <div class="col-md-4">
+            <b>FBK Foundation</b>
+          </div>
+          <div class="col-md-4">
+            <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu/</b></a>
           </div>
         </div>
-      </footer>
-      <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
-      <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
-      <script>
-      function update_image(){
-          var posting = $.post(
-            '/calib_crop_rotate_done',
-              {param_0: $("#left").val(), param_1: $("#top").val(), param_2: $("#right").val(), param_3: $("#bott").val(), param_4: $("#rot").val()}
-          );
-          posting.done(function( data ) {
-              if(data=="OK"){
-                //location.reload();
-                get_new_image()
-                //$('#spectrum_img').attr("src", "/static/processed.png?" );
-              }
-              else{
-                alert("ERROR")
-              }
-          });
-      }
+      </div>
+    </footer>
+    <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+    function update_image(){
+        var posting = $.post(
+          '/calib_crop_rotate_done',
+            {param_0: $("#left").val(), param_1: $("#top").val(), param_2: $("#right").val(), param_3: $("#bott").val(), param_4: $("#rot").val()}
+        );
+        posting.done(function( data ) {
+            if(data=="OK"){
+              //location.reload();
+              get_new_image()
+              //$('#spectrum_img').attr("src", "/static/processed.png?" );
+            }
+            else{
+              alert("ERROR")
+            }
+        });
+    }
 
-      //$("#submit").click(
-      //});
+    //$("#submit").click(
+    //});
 
-      function get_new_image(){
-        $('#spectrum_div').html("<img src='/static/processed.png?"+ new Date().getTime()+"' style='width:60%;'/>")
-      }
+    function get_new_image(){
+      $('#spectrum_div').html("<img src='/static/processed.png?"+ new Date().getTime()+"' style='width:60%;'/>")
+    }
 
-      </script>
-    </body>
+    </script>
+  </body>
 </html>

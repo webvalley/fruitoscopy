@@ -346,8 +346,8 @@ if __name__ == "__main__":
         os.system("mkdir " + HOME_PATH + '/configuration')
     if(not os.path.isdir(HOME_PATH + '/temp_data')):
         os.system("mkdir " + HOME_PATH + '/temp_data')
-    if(os.path.isfile(HOME_PATH + '/static/processed_white.jpg')):
-        os.system("rm " + HOME_PATH + '/static/processed_white.jpg')
+    if(os.path.isfile(HOME_PATH + '/static/processed_white.png')):
+        os.system("rm " + HOME_PATH + '/static/processed_white.png')
     if(not os.path.isfile(HOME_PATH + '/timestamp.txt')):
         out_file = open(HOME_PATH + '/timestamp.txt',"w")
         out_file.write(str(0))

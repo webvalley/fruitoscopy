@@ -20,18 +20,14 @@ b {color: #ffffff;}
 
 html,body {height: 100%;}
 
+.push{
+  height:185px;
+}
+
 .wrapper{
   min-height: 100%;
 	margin: 0 auto -185px; /* the bottom margin is the negative value of the footer's height */
 }
-
-.fix {padding-right: 0;
-     width: auto;
-     margin: 0;}
-
-.fix2 {padding-left: 0;
-     padding-right: 0;
-     width: auto;}
 
 .dropdown-menu {width: 100%;
                text-align: center;}

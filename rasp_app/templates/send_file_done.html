@@ -25,13 +25,13 @@
     </style>
     <nav class="navbar navbar-default">
       <br>
-      <div class="container-fluid fix row">
+      <div class="container-fluid row" style="padding:0;margin:0;">
         <div>
           <a class="navbar-brand" href="/">
-            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;margin-left:2vw;" src="{{url_for('static', filename='logoFBK-2.png') }}">
           </a>
         </div>
-        <div class="col-md-4 fix2">
+        <div class="navbar-header col-md-5" style="padding:0;margin:0;">
           <centre>
             <h1 class="navbar-title">Upload configuration file</h1>
           </centre>
@@ -39,15 +39,34 @@
       </div>
       <br>
     </nav>
-    <div style="width:60vw;margin-left:auto;margin-right:auto;margin-top:20vh;">
-      <center>
-        <div id="file_div">
-          <div class="alert alert-success">
-            <strong>File uploaded correctly</strong>
+    <div class="wrapper">
+      <div style="width:60vw;margin-left:auto;margin-right:auto;margin-top:20vh;">
+        <center>
+          <div id="file_div">
+            <div class="alert alert-success">
+              <strong>File uploaded correctly</strong>
+            </div>
+          </div>
+        </center>
+      </div>
+      <div class="push"></div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <br>
+        <div class="row">
+          <div class="col-md-4">
+            <b>Web Valley 2016</b>
+          </div>
+          <div class="col-md-4">
+            <b>FBK Foundation</b>
+          </div>
+          <div class="col-md-4">
+            <a href="http://www.fbk.eu/" title="link"><b>www.fbk.eu/</b></a>
           </div>
         </div>
-      </center>
-    </div>
+      </div>
+    </footer>
     <script src="{{url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
   </body>
