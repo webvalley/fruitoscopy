@@ -12,22 +12,7 @@
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
-    <style type="text/css">
-      .navbar-title {
-        color: #337ab7;
-        font-family: Arial;
-      }
-      .footer {background-color: #455a64;
-              height: 20%;
-              position: absolute;
-              left: 0;
-              bottom: auto;
-              right: 0;}
-      .col-md-4 {text-align: center;
-                padding: none;}
-      b {color: #ffffff;}
-      span {font-weight: 600; font-size:160%;}
-    </style>
+    <link href="{{url_for('static', filename='style.css') }}" type="text/css" rel="stylesheet" type="text/css"/>
   </head>
 
   <body onload="get_new_image()">
@@ -53,29 +38,29 @@
       </center>
       <div style="width:70vw;margin-left:auto;margin-right:auto;">
         <hr style="border: #c5c1be solid 2px!important;">
-        <div style="text-align:center;"><span>Left side</span>
-        <div style="float:right;"><span>--</span></div>
-        <div style="float:left;"><span>+</span></div></div>
+        <div style="text-align:center;"><span class="big_span">Left side</span>
+        <div style="float:right;"><span class="big_span">--</span></div>
+        <div style="float:left;"><span class="big_span">+</span></div></div>
         <input type=range min=0 max=1640 name=param_0 id=left value= {{param[0]}} onchange="update_image()">
         <hr style="border: #c5c1be solid 2px!important;">
-        <div style="text-align:center;"><span>Top side</span>
-        <div style="float:right;"><span>--</span></div>
-        <div style="float:left;"><span>+</span></div></div>
+        <div style="text-align:center;"><span class="big_span">Top side</span>
+        <div style="float:right;"><span class="big_span">--</span></div>
+        <div style="float:left;"><span class="big_span">+</span></div></div>
         <input type=range min=0 max=1300 name=param_1 id=top value= {{param[1]}} onchange="update_image()">
         <hr style="border: #c5c1be solid 2px!important;">
-        <div style="text-align:center;"><span>Right side</span>
-        <div style="float:right;"><span>+</span></div>
-        <div style="float:left;"><span>--</span></div></div>
+        <div style="text-align:center;"><span class="big_span">Right side</span>
+        <div style="float:right;"><span class="big_span">+</span></div>
+        <div style="float:left;"><span class="big_span">--</span></div></div>
         <input type=range min=1640 max=3280 name=param_2 id=right value= {{param[2]}} onchange="update_image()">
         <hr style="border: #c5c1be solid 2px!important;">
-        <div style="text-align:center;"><span>Bottom side</span>
-        <div style="float:right;"><span>+</span></div>
-        <div style="float:left;"><span>--</span></div></div>
+        <div style="text-align:center;"><span class="big_span">Bottom side</span>
+        <div style="float:right;"><span class="big_span">+</span></div>
+        <div style="float:left;"><span class="big_span">--</span></div></div>
         <input type=range min=1200 max=2464 name=param_3 id=bott value= {{param[3]}} onchange="update_image()">
         <hr style="border: #c5c1be solid 2px!important;">
-        <div style="text-align:center;"><span>Rotation</span>
-        <div style="float:right;"><span>CCW ↺</span></div>
-        <div style="float:left;"><span>CW ↻</span></div></div>
+        <div style="text-align:center;"><span class="big_span">Rotation</span>
+        <div style="float:right;"><span class="big_span">CCW ↺</span></div>
+        <div style="float:left;"><span class="big_span">CW ↻</span></div></div>
         <input type=range min="-15" max="15" name=param_4 id=rot value= {{param[4]}} onchange="update_image()">
         <hr style="border: #c5c1be solid 2px!important;">
       </div>

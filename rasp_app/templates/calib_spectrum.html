@@ -10,22 +10,9 @@
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
-    <style>
-    .navbar-title {color: #337ab7;
-                  font-family: Arial;}
-    b {color: #ffffff;}
-    .col-md-4 {text-align: center;
-              padding: none;}
-    .footer {background-color: #455a64;
-            height: 20%;
-            position: absolute;
-            left: 0;
-            bottom: auto;
-            right: 0;}
-      span {font-weight: 600; font-size:160%;}
-    </style>
-    <body onload="get_first_image()">
+    <link href="{{url_for('static', filename='style.css') }}" type="text/css" rel="stylesheet" type="text/css"/>
   </head>
+  <body onload="get_first_image()">
     <nav class="navbar navbar-default">
       <br>
       <div>
@@ -50,10 +37,10 @@
         <img id="spectrum_img" src="/static/processed.png" style="width:100%;display:none;"/>
       </div>
       <hr style="border: #c5c1be solid 2px!important;">
-      <div style="text-align:center;"><span>Center of the Blue color</span></div><br>
+      <div style="text-align:center;"><span class="big_span">Center of the Blue color</span></div><br>
       <input type=range name=blue id="blue" style="width:100%;" min=0 max=1000 value={{param[0]}} onchange="update_canvas()">
       <hr style="border: #c5c1be solid 2px!important;">
-      <div style="text-align:center;"><span>Between Green and Yellow</span></div><br>
+      <div style="text-align:center;"><span class="big_span">Between Green and Yellow</span></div><br>
       <input type=range name=red id="red" style="width:100%;" min=0 max=1000 value={{param[1]}} onchange="update_canvas()">
       <hr style="border: #c5c1be solid 2px!important;">
       <button type="submit" id="upload_changes" class="btn btn-primary btn-lg btn-block">Upload changes</button>
