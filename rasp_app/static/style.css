@@ -1,0 +1,39 @@
+.navbar-title {color: #337ab7;
+              font-family: Arial;}
+
+b {color: #ffffff;}
+
+.col-md-4 {text-align: center;
+          padding: none;}
+
+.navbar {margin-bottom: 0;
+        border: 0;}
+
+.buttons {background-color: #ffffff;}
+
+.footer {background-color: #455a64;
+        height: 20%;
+        position: absolute;
+        left: 0;
+        bottom: auto;
+        right: 0;}
+
+.body {min-height: 100%;
+      height: auto;
+      height: 100%;}
+
+.push {height: 480px;
+      clear: both;}
+
+.fix {padding-right: 0;
+     width: auto;
+     margin: 0;}
+
+.fix2 {padding-left: 0;
+     padding-right: 0;
+     width: auto;}
+
+.dropdown-menu {width: 100%;
+               text-align: center;}
+               
+a { text-decoration: none !important;}
