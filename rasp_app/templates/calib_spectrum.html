@@ -47,7 +47,7 @@
       Your browser does not support CANVAS :(
       </canvas>
       <div id="img_div">
-        <img id="spectrum_img" src="/static/processed.jpg" style="width:100%;display:none;"/>
+        <img id="spectrum_img" src="/static/processed.png" style="width:100%;display:none;"/>
       </div>
       <hr style="border: #c5c1be solid 2px!important;">
       <div style="text-align:center;"><span>Center of the Blue color</span></div><br>
@@ -93,7 +93,7 @@
         });
     });
     function get_first_image(){
-      $('#img_div').html("<img id=\"spectrum_img\" src=\"/static/processed.jpg?"+ new Date().getTime() +"\" style=\"width:100%;display:none;\" onload=\"update_canvas()\"/>");
+      $('#img_div').html("<img id=\"spectrum_img\" src=\"/static/processed.png?"+ new Date().getTime() +"\" style=\"width:100%;display:none;\" onload=\"update_canvas()\"/>");
       //$('#spectrum_img').onload = update_canvas();
     }
     function update_canvas(){

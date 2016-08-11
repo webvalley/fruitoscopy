@@ -112,7 +112,7 @@
               if(data=="OK"){
                 //location.reload();
                 get_new_image()
-                //$('#spectrum_img').attr("src", "/static/processed.jpg?" );
+                //$('#spectrum_img').attr("src", "/static/processed.png?" );
               }
               else{
                 alert("ERROR")
@@ -124,7 +124,7 @@
       //});
 
       function get_new_image(){
-        $('#spectrum_div').html("<img src='/static/processed.jpg?"+ new Date().getTime()+"' style='width:60%;'/>")
+        $('#spectrum_div').html("<img src='/static/processed.png?"+ new Date().getTime()+"' style='width:60%;'/>")
       }
 
       </script>

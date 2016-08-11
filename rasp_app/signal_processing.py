@@ -17,6 +17,7 @@ from calibration import get_white_spectrum
 
 HOME_PATH  = os.path.dirname(os.path.abspath(__file__))
 
+#This function could be also be deleted since it isn't used
 def mins(array,wl):
     """
     This function receive as input the spectrum and the wavelenghts.
@@ -140,7 +141,7 @@ def save_plot(array, wl=[],controls=0):
     return script, div
 
 
-def get_image(new_photo = 0, white_calibration = 0):
+def get_image(new_photo = False, white_calibration = False):
     """
     This function receive as input some parameters as a tuple.
     The return value is the image of the spectrum.
@@ -166,10 +167,12 @@ def get_image(new_photo = 0, white_calibration = 0):
     im=Image.open(HOME_PATH + '/source.jpg')
     im=im.rotate(param[4])
     im = im.crop(box=param[:4])
+
+    #We need to save the spectra as PNG because the JPG compress them altering the data
     if white_calibration:
-        im.save(HOME_PATH + '/static/processed_white.jpg')
+        im.save(HOME_PATH + '/static/processed_white.png')
     else:
-        im.save(HOME_PATH + '/static/processed.jpg')
+        im.save(HOME_PATH + '/static/processed.png')
 
     #Better not to resize, data is lost or altered too much
     #maxsize = (1000, im.size[0])
@@ -207,7 +210,7 @@ def filter_white(baseline):
     ----------
     :value 0: List of y elements of the spectrum
     """
-    im=Image.open(HOME_PATH + '/source.jpg')
+    im=Image.open(HOME_PATH + '/static/processed_white.png')
     img_white = im.load()
 
     param=get_params()
@@ -221,10 +224,12 @@ def filter_white(baseline):
             r,g,b = img_white[col,row]
             tot[col].append(r+g+b)
 
-    for i in range(tot):
-        baseline = max(tot[i]) / baseline[i]
+    filtered = []
+    for to,ba in zip(tot,baseline):
+        print("%f --- %f" %(max(to),ba))
+        filtered.append(max(to) / ba)
 
-    return baseline
+    return filtered
 
 def get_baseline(img_spectrum):
     """
@@ -300,11 +305,13 @@ def process_image(white_spectrum = 0):
     baseline = get_baseline(img_spectrum)
     filtered = filter_white(baseline)
     #plt.plot(black_line, color="blue")
+    #print(baseline)
+    #print()
+    #print(filtered)
     almost_good = sps.savgol_filter(filtered, 51, 3)
     #plt.plot(almost_good, color="red")
     #savefig(HOME_PATH + '/aabbbccc.png', bbox_inches='tight')
     wl = np.array(range(400,801))
-    idx = mins(almost_good,wl)
 
     background_rem = remove_background(almost_good)
 
