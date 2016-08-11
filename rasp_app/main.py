@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import time
 import sqlite3 as lite
 import scipy.signal as sps
-from matplotlib.pylab import savefig
+#from matplotlib.pylab import savefig
 from PIL import Image
 import datetime
 from signal_processing import *
@@ -32,9 +32,6 @@ def data_taken():
 
     TODO: return also machine learning prediction
     """
-
-    if( not os.path.isfile(HOME_PATH + '/white_cal.txt')):
-        return "NO,,White calibration is needed"
 
     fruit = int(request.form.get('fruit'))
     gps = request.form.get('gps')
@@ -78,7 +75,7 @@ def take_data(fruit):
     ----------
     - The confirmation HTML page
     """
-    if(not os.path.isfile(HOME_PATH + '/static/processed_white.jpg')):
+    if(not os.path.isfile(HOME_PATH + '/static/processed_white.png')):
         get_white = 1
     else:
         get_white = 0

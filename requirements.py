@@ -11,7 +11,6 @@ itsdangerous==0.24
 Jinja2==2.8
 jsonschema==2.5.1
 MarkupSafe==0.23
-matplotlib==1.5.1
 mpmath==0.19
 networkx==1.11
 numpy==1.11.1
@@ -25,7 +24,6 @@ pyparsing==2.1.5
 python-dateutil==2.5.3
 pytz==2016.4
 pyzmq==15.2.0
-savefig==0.0.2
 scikit-image==0.12.3
 scikit-learn==0.17.1
 scipy==0.17.1
