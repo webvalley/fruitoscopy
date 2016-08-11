@@ -12,18 +12,18 @@ b {color: #ffffff;}
 .buttons {background-color: #ffffff;}
 
 .footer {background-color: #455a64;
-        height: 20%;
+        height: 185px;
         position: absolute;
         left: 0;
         bottom: auto;
         right: 0;}
 
-.body {min-height: 100%;
-      height: auto;
-      height: 100%;}
+html,body {height: 100%;}
 
-.push {height: 480px;
-      clear: both;}
+.wrapper{
+  min-height: 100%;
+	margin: 0 auto -185px; /* the bottom margin is the negative value of the footer's height */
+}
 
 .fix {padding-right: 0;
      width: auto;
@@ -35,5 +35,5 @@ b {color: #ffffff;}
 
 .dropdown-menu {width: 100%;
                text-align: center;}
-               
+
 a { text-decoration: none !important;}
