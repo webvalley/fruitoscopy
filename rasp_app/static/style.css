@@ -1,0 +1,37 @@
+.navbar-title {color: #337ab7;
+              font-family: Arial;}
+
+b {color: #ffffff;}
+
+.col-md-4 {text-align: center;
+          padding: none;}
+
+.navbar {margin-bottom: 0;
+        border: 0;}
+
+.buttons {background-color: #ffffff;}
+
+.footer {background-color: #455a64;
+        height: 185px;
+        position: absolute;
+        left: 0;
+        bottom: auto;
+        right: 0;}
+
+html,body {height: 100%;}
+
+.push{
+  height:185px;
+}
+
+.wrapper{
+  min-height: 100%;
+	margin: 0 auto -185px; /* the bottom margin is the negative value of the footer's height */
+}
+
+.dropdown-menu {width: 100%;
+               text-align: center;}
+
+a { text-decoration: none !important;}
+
+span.big_span {font-weight: 600; font-size:160%;}

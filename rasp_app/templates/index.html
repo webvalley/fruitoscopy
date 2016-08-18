@@ -12,62 +12,27 @@
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
-
+    <link href="{{url_for('static', filename='style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
   </head>
 
-  <body>
-
-    <style type="text/css">
-      .navbar-title {color: #337ab7;
-                    font-family: Arial;}
-      b {color: #ffffff;}
-      .col-md-4 {text-align: center;
-                padding: none;}
-      .navbar {margin-bottom: 0;
-              border: 0;}
-      .buttons {background-color: #ffffff;}
-      .footer {background-color: #455a64;
-              height: 20%;
-              position: absolute;
-              left: 0;
-              bottom: auto;
-              right: 0;}
-      .body {min-height: 100%;
-            height: auto;
-            height: 100%;}
-      .push {height: 480px;
-            clear: both;}
-      .fix {padding-right: 0;
-           width: auto;
-           margin: 0;}
-      .fix2 {padding-left: 0;
-           padding-right: 0;
-           width: auto;}
-      .dropdown-menu {width: 100%;
-                     text-align: center;}
-      body {background-image: url({{url_for('static', filename='sfondo.jpg') }});}
-      body {background-size: cover;
-           background-attachment: fixed;}
-      a { text-decoration: none !important;}
-    </style>
-    <div class="body">
-      <nav class="navbar navbar-default">
-        <br>
-        <div class="container-fluid fix row">
-          <div class="navbar-header col-md-1">
-            <a class="navbar-brand" href="/">
-              <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
-            </a>
-          </div>
-          <div class="col-md-4 fix2">
-            <centre>
-              <h1 class="navbar-title">Fruitipy index</h1>
-            </centre>
-          </div>
+  <body style="background-image: url({{url_for('static', filename='sfondo.jpg') }});background-size: cover;background-attachment: fixed;">
+    <nav class="navbar navbar-default">
+      <br>
+      <div class="container-fluid row" style="padding:0;margin:0;">
+        <div>
+          <a class="navbar-brand" href="/">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;margin-left:2vw;" src="{{url_for('static', filename='logoFBK-2.png') }}">
+          </a>
         </div>
-        <br>
-      </nav>
-
+        <div class="navbar-header col-md-2" style="padding:0;margin:0;">
+          <centre>
+            <h1 class="navbar-title">Fruitipy Index</h1>
+          </centre>
+        </div>
+      </div>
+      <br>
+    </nav>
+    <div class="wrapper">
       <div class="container-fluid buttons">
         <br>
         <div class="row">

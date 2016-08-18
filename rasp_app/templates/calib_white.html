@@ -14,64 +14,39 @@
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{url_for('static', filename='style.css') }}" type="text/css" rel="stylesheet" type="text/css"/>
     <script src="{{url_for('static', filename='bokeh/bokeh-0.12.0.min.js') }}"></script>
+    <style type="text/css">
+      .dropdown-menu {width: 400px;
+                     text-align: center;}
+      table {width: 100%;}
+      td {width: 33%;
+         text-align: center;
+         margin-top: auto;}
+      .form-control {margin-inline-start: 20%;
+                    margin-inline-end: 20%;
+                    margin-top: 5%;
+                    margin-bottom: 5%;}
+      .spectrum_div {
+        width: 50vw;
+        margin-left:auto;
+        margin-right:auto;
+      }
+    </style>
   </head>
 
   <body>
-
-  <style type="text/css">
-    .navbar-title {color: #337ab7;
-                  font-family: Arial;}
-    .col-md-4 {text-align: center;
-              padding: none;}
-    .navbar {margin-bottom: 0;
-            border: 0;}
-    .buttons {background-color: #ffffff;}
-    .footer {background-color: #455a64;
-            height: 20%;
-            position: absolute;
-            left: 0;
-            bottom: auto;
-            right: 0;}
-    .body {min-height: 100%;
-          height: auto;
-          height: 100%;}
-    .push {height: 480px;
-          clear: both;}
-    .fix {padding-right: 0;
-         width: auto;
-         margin: 0;}
-    .fix2 {padding-left: 0;
-         padding-right: 0;
-         width: auto;}
-    .dropdown-menu {width: 400px;
-                   text-align: center;}
-    table {width: 100%;}
-    td {width: 33%;
-       text-align: center;
-       margin-top: auto;}
-    .form-control {margin-inline-start: 20%;
-                  margin-inline-end: 20%;
-                  margin-top: 5%;
-                  margin-bottom: 5%;}
-    .spectrum_div {
-      width: 50vw;
-      margin-left:auto;
-      margin-right:auto;
-    }
-  </style>
-
     <nav class="navbar navbar-default">
       <br>
-      <div class="container-fluid fix row">
-        <div class="navbar-header col-md-1">
+      <div class="container-fluid row" style="padding:0;margin:0;">
+        <div>
           <a class="navbar-brand" href="/">
-            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;" src="{{url_for('static', filename='logoFBK-2.png') }}">
+            <img alt="FBK" style="height:200%;margin-top:auto;margin-bottom:auto;margin-left:2vw;" src="{{url_for('static', filename='logoFBK-2.png') }}">
           </a>
         </div>
-        <div class="col-md-4 fix2">
+        <div class="navbar-header col-md-3" style="padding:0;margin:0;">
           <centre>
-            <h1 class="navbar-title">Take sample</h1>
+            <h1 class="navbar-title">White calibration</h1>
           </centre>
         </div>
       </div>
